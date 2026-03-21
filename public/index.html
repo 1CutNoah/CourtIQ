@@ -533,6 +533,17 @@ const RECENT_FORM_GAMES    = 10;
 
 // NBA Stats
 const NBA_STATS_SEASON = '2024-25';
+// Maps NBA Stats TeamID → ESPN team abbreviation (ESPN uses shorter forms)
+const NBA_STATS_ID_TO_ESPN_ABBR = {
+  1610612737:'ATL',1610612738:'BOS',1610612739:'CLE',1610612740:'NO',
+  1610612741:'CHI',1610612742:'DAL',1610612743:'DEN',1610612744:'GS',
+  1610612745:'HOU',1610612746:'LAC',1610612747:'LAL',1610612748:'MIA',
+  1610612749:'MIL',1610612750:'MIN',1610612751:'BKN',1610612752:'NY',
+  1610612753:'ORL',1610612754:'IND',1610612755:'PHI',1610612756:'PHX',
+  1610612757:'POR',1610612758:'SAC',1610612759:'SA', 1610612760:'OKC',
+  1610612761:'TOR',1610612762:'UTA',1610612763:'MEM',1610612764:'WSH',
+  1610612765:'DET',1610612766:'CHA'
+};
 
 // Refresh & line movement
 const REFRESH_INTERVAL_MS       = 15 * 60 * 1000; // 15 minutes
@@ -746,28 +757,54 @@ function detectFlags(team,opponentAbbr){
 // ─── ESPN APIs ────────────────────────────────────────────────────────────────
 async function fetchStandings(){
   try{
-    const d=await fetchJ('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings');
+    const url=`https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=${NBA_STATS_SEASON}&SeasonType=Regular+Season`;
+    const d=await fetch(`/api/nba?url=${encodeURIComponent(url)}`).then(r=>r.json());
+    const rs=d.resultSets?.[0];
+    if(!rs) throw new Error('No standings data');
+    const idx=h=>rs.headers.indexOf(h);
+    const iTeamId=idx('TeamID'), iConf=idx('Conference'), iSeed=idx('PlayoffRank');
+    const iDiv=idx('Division'), iDivRank=idx('DivisionRank'), iGb=idx('ConferenceGamesBack');
+    const iClinch=idx('ClinchedIndicator');
     const m={};
-    (d.children||[]).forEach(conf=>{
-      const cname=(conf.name||'').includes('East')?'East':'West';
-      (conf.standings?.entries||[]).forEach((e,i)=>{
-        const tid=e.team?.id; if(!tid)return;
-        const st={};
-        (e.stats||[]).forEach(s=>{st[s.name]=s.value;});
-        const gb=parseFloat(st.gamesBehind||st.gamesBack||0);
-        const ci=(st.clinchIndicator||'').toString().toLowerCase();
-        let clinch='';
-        if(ci==='e') clinch='ELIM';
-        else if(ci==='z') clinch='CONF';
-        else if(ci==='y') clinch='DIV';
-        else if(ci==='x'||ci==='p') clinch='CLINCHED';
-        // Use actual playoff seed from stats, fall back to array index
-        const seed=st.playoffSeed??st.seed??st.rank??(i+1);
-        m[tid]={rank:Math.round(seed),conf:cname,gb,clinch};
-      });
-    });
+    for(const row of rs.rowSet){
+      const nbaId=row[iTeamId]; const tid=String(nbaId); if(!tid)continue;
+      const abbr=NBA_STATS_ID_TO_ESPN_ABBR[nbaId]||'';
+      const conf=row[iConf]==='East'?'East':'West';
+      const seed=row[iSeed]||0;
+      const gb=parseFloat(row[iGb]||0);
+      const divRank=row[iDivRank]||0;
+      const div=row[iDiv]||'';
+      const ci=(row[iClinch]||'').toString().toLowerCase();
+      let clinch='';
+      if(ci==='e') clinch='ELIM';
+      else if(ci==='z') clinch='CONF';
+      else if(ci==='y') clinch='DIV';
+      else if(ci==='x'||ci==='p') clinch='CLINCHED';
+      const entry={rank:seed,conf,gb,clinch,div,divRank};
+      m[tid]=entry;       // NBA Stats ID key
+      if(abbr) m[abbr]=entry; // abbreviation key (for ESPN team lookup)
+    }
     return m;
-  }catch{return{};}
+  }catch(e){
+    console.warn('NBA standings failed, falling back to ESPN:',e.message);
+    // Fallback to ESPN
+    try{
+      const d=await fetchJ('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings');
+      const m={};
+      (d.children||[]).forEach(conf=>{
+        const cname=(conf.name||'').includes('East')?'East':'West';
+        (conf.standings?.entries||[]).forEach((e,i)=>{
+          const tid=e.team?.id; if(!tid)return;
+          const st={};
+          (e.stats||[]).forEach(s=>{st[s.name]=s.value;});
+          const gb=parseFloat(st.gamesBehind||st.gamesBack||0);
+          const seed=st.playoffSeed??st.seed??st.rank??(i+1);
+          m[tid]={rank:Math.round(seed),conf:cname,gb,clinch:''};
+        });
+      });
+      return m;
+    }catch{return{};}
+  }
 }
 
 async function fetchCoreOdds(eventId) {
@@ -1186,7 +1223,7 @@ function buildPrompt(g){
   const picks=odds?`"${away.abbr} ${fs(-odds.homeSpread)}" or "${home.abbr} ${fs(odds.homeSpread)}" or "PASS"`:`"PASS"`;
 
   // Standings context
-  const hSt=S.standings[home.id], aSt=S.standings[away.id];
+  const hSt=S.standings[home.id]||S.standings[home.abbr], aSt=S.standings[away.id]||S.standings[away.abbr];
 
   // H2H this season
   const h2h=g.h2h;
@@ -1598,11 +1635,12 @@ function renderCard(game){
   </div>`;
 
   // Seed badges
-  const hSt=S.standings[home.id], aSt=S.standings[away.id];
+  const hSt=S.standings[home.id]||S.standings[home.abbr], aSt=S.standings[away.id]||S.standings[away.abbr];
   const seedBadge=st=>{
     if(!st)return '';
     const cls=st.clinch==='ELIM'?'seed-x':st.clinch?'seed-e':st.rank<=10?'seed-pi':'';
-    return `<span class="seed-badge ${cls}">#${st.rank} ${st.conf}</span>`;
+    const divTag=st.div&&st.divRank?` · ${st.div.replace(' Division','')} #${st.divRank}`:'';
+    return `<span class="seed-badge ${cls}" title="${st.div||''}">#${st.rank} ${st.conf}${divTag}</span>`;
   };
   // Line movement
   const opening=S.openingOdds[id];

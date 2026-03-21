@@ -761,7 +761,9 @@ async function fetchStandings(){
         else if(ci==='z') clinch='CONF';
         else if(ci==='y') clinch='DIV';
         else if(ci==='x'||ci==='p') clinch='CLINCHED';
-        m[tid]={rank:i+1,conf:cname,gb,clinch};
+        // Use actual playoff seed from stats, fall back to array index
+        const seed=st.playoffSeed??st.seed??st.rank??(i+1);
+        m[tid]={rank:Math.round(seed),conf:cname,gb,clinch};
       });
     });
     return m;

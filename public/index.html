@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourtIQ — NBA Daily Betting Intel</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00c2a8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #0a0b0d;
+  --surface: #111315;
+  --surface2: #171a1c;
+  --surface3: #1d2022;
+  --border: #252829;
+  --border2: #2e3235;
+  --accent: #00c2a8;
+  --adim: rgba(0,194,168,.1);
+  --aglow: rgba(0,194,168,.18);
+  --text: #e8f0fe;
+  --muted: #5a7390;
+  --dim: #2a3f58;
+  --green: #10b981;
+  --red: #f43f5e;
+  --gold: #f59e0b;
+  --orange: #fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;top:-300px;left:50%;transform:translateX(-50%);width:1200px;height:600px;background:radial-gradient(ellipse,rgba(0,194,168,.05) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* LOADING */
+.lov{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;transition:opacity .4s}
+.lov.hide{opacity:0;pointer-events:none}
+.spin{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp .65s linear infinite}
+.spin-sm{width:13px;height:13px;border:2px solid var(--dim);border-top-color:var(--accent);border-radius:50%;animation:sp .65s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ltxt{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+
+/* HEADER */
+.hdr{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:26px 36px 0;max-width:1400px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-img{width:36px;height:36px;border-radius:9px;flex-shrink:0}
+.logo-txt{font-size:24px;font-weight:900;letter-spacing:-.6px;color:var(--accent)}
+.hmeta{display:flex;flex-direction:column;gap:2px;margin-left:18px;padding-left:18px;border-left:1px solid var(--border)}
+.hdate{font-size:13px;color:var(--muted);font-weight:500}
+.hupd{font-size:11px;color:var(--dim);font-weight:400}
+.hright{display:flex;align-items:center;gap:12px}
+.badge{background:var(--adim);border:1px solid rgba(0,194,168,.3);color:var(--accent);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.04em}
+.btn-g{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);padding:8px 18px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;font-family:inherit}
+.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.ai-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:500}
+
+/* TABS */
+.tabs{position:relative;z-index:10;display:flex;gap:0;padding:20px 36px 0;max-width:1400px;margin:0 auto;border-bottom:1px solid var(--border)}
+.tb{background:none;border:none;cursor:pointer;padding:11px 22px 15px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;letter-spacing:.04em;font-family:inherit;text-transform:uppercase}
+.tb:hover{color:var(--text)}
+.tb.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* MAIN */
+main{position:relative;z-index:5;max-width:1400px;margin:0 auto;padding:24px 32px 80px}
+.tsec{display:none}.tsec.active{display:block}
+.empty{text-align:center;padding:80px 20px;color:var(--muted)}
+.empty .ei{font-size:44px;display:block;margin-bottom:12px}
+
+/* GAMES GRID */
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:14px}
+@media(max-width:580px){.gg{grid-template-columns:1fr}.hdr,.tabs,main{padding-left:16px;padding-right:16px}}
+
+/* GAME CARD */
+.gc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.gc:hover{border-color:rgba(0,194,168,.25);box-shadow:0 0 28px rgba(0,194,168,.06)}
+.gc-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.gc-time{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.gc-venue{font-size:10px;color:var(--dim);font-weight:500}
+.gc-net{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.04em}
+
+/* Matchup */
+.mu{display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;padding:16px 14px 12px;gap:6px}
+.ts{display:flex;flex-direction:column;gap:5px}
+.ts.aw{align-items:flex-start}
+.ts.hm{align-items:flex-end;text-align:right}
+.lrel{position:relative;display:inline-block}
+.tlogo{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))}
+.b2b-p{position:absolute;top:-4px;right:-6px;background:var(--red);color:#fff;font-size:7px;font-weight:800;padding:1px 4px;border-radius:4px;letter-spacing:.03em}
+.slbl{font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.tnm{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.trec{font-size:11px;color:var(--muted);font-weight:500}
+.tsit{font-size:10px;color:var(--dim);font-weight:400}
+.tpwr{font-size:12px;color:var(--accent);font-weight:800;letter-spacing:-.1px}
+.rtag{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;letter-spacing:.04em;text-transform:uppercase}
+.rb2b{background:rgba(244,63,94,.12);color:var(--red)}
+.r1d{background:rgba(251,146,60,.1);color:var(--orange)}
+.rok{background:rgba(16,185,129,.08);color:var(--green)}
+.vs{text-align:center;color:var(--dim);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+
+/* Injury */
+.inj-row{padding:6px 14px;border-top:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.inj-icon{font-size:10px;color:var(--dim);flex-shrink:0}
+.chip{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.c-out{background:rgba(244,63,94,.12);color:var(--red)}
+.c-q{background:rgba(251,146,60,.1);color:var(--orange)}
+.c-p{background:rgba(16,185,129,.08);color:var(--green)}
+.c-none{font-size:10px;color:var(--dim)}
+.inj-div{color:var(--dim);font-size:10px}
+
+/* Odds */
+.odds-row{display:flex;border-top:1px solid var(--border)}
+.oc{flex:1;padding:10px 12px;border-right:1px solid var(--border)}
+.oc:last-child{border-right:none}
+.ol{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;font-weight:600}
+.ov{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.os{font-size:10px;color:var(--muted);font-weight:500;margin-top:1px}
+.no-odds{padding:10px 14px;font-size:11px;color:var(--dim);font-style:italic;border-top:1px solid var(--border)}
+
+/* AI section */
+.ai-sec{border-top:1px solid var(--border)}
+.ai-load{padding:14px;display:flex;align-items:center;gap:10px}
+.ai-ltxt{font-size:12px;color:var(--muted);font-weight:500}
+.ai-res{padding:14px}
+.ai-pr{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.cbadge{font-size:9px;font-weight:800;padding:3px 10px;border-radius:5px;letter-spacing:.07em;flex-shrink:0;text-transform:uppercase}
+.cb-best{background:rgba(245,158,11,.14);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.cb-strong{background:var(--adim);color:var(--accent);border:1px solid rgba(0,194,168,.35)}
+.cb-play{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.cb-lean{background:rgba(90,115,144,.1);color:var(--muted);border:1px solid var(--border2)}
+.ai-ptxt{font-size:17px;font-weight:900;letter-spacing:-.3px}
+.ai-sharp{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;margin-bottom:10px;padding:9px 12px;background:var(--surface2);border-radius:8px;border-left:2px solid var(--accent);font-weight:400}
+.ai-facts{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.ai-fact{font-size:12px;color:var(--text);font-weight:400;line-height:1.4}
+.ai-risk{font-size:11px;color:var(--orange);padding:7px 11px;background:rgba(251,146,60,.06);border-radius:7px;border:1px solid rgba(251,146,60,.15);font-weight:500}
+.ai-err{padding:12px 14px;font-size:12px;color:var(--red);font-weight:500}
+.ai-idle{padding:11px 14px;display:flex;align-items:center;gap:8px}
+.ai-itxt{font-size:12px;color:var(--dim);font-weight:500}
+
+/* Stat pick row */
+.sp-row{padding:9px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px;background:var(--surface2)}
+.spt{font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;flex-shrink:0;text-transform:uppercase;letter-spacing:.05em}
+.tS{background:rgba(245,158,11,.14);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.tA{background:var(--adim);color:var(--accent);border:1px solid rgba(0,194,168,.3)}
+.tB{background:rgba(16,185,129,.08);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.tP{background:rgba(90,115,144,.08);color:var(--muted);border:1px solid var(--border2)}
+.sptxt{font-size:13px;font-weight:800;flex:1;letter-spacing:-.1px}
+.spedge{font-size:11px;color:var(--muted);font-weight:600}
+
+/* PICKS TAB */
+.ptop{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.psbox{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 22px;flex:1;min-width:90px;text-align:center;transition:border-color .2s}
+.psbox:hover{border-color:var(--border2)}
+.psval{font-size:28px;font-weight:900;letter-spacing:-.5px}
+.pslbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.plist{display:flex;flex-direction:column;gap:12px}
+.fpc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.fpc.bp-best{border-color:rgba(245,158,11,.3)}
+.fpc.bp-strong{border-color:rgba(0,194,168,.3)}
+.fpc.bp-play{border-color:rgba(16,185,129,.22)}
+.fpc-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.fpc-hl{display:flex;align-items:center;gap:9px}
+.fpc-time{font-size:11px;color:var(--muted);font-weight:500}
+.fpc-body{display:flex;align-items:center;gap:16px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.fpc-logo{width:50px;height:50px;object-fit:contain}
+.fpc-main{flex:1}
+.fpc-team{font-size:20px;font-weight:900;letter-spacing:-.4px}
+.fpc-spr{font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-.3px}
+.fpc-vs{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
+.fpc-edge{text-align:right}
+.fpc-enum{font-size:26px;font-weight:900;letter-spacing:-.5px}
+.fpc-elbl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;font-weight:600}
+.fpc-sharp{margin:12px 18px;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:2px solid var(--accent);font-size:12px;color:var(--muted);font-style:italic;line-height:1.5}
+.fpc-facts{padding:0 18px 10px;display:flex;flex-direction:column;gap:5px}
+.fpc-fact{font-size:13px;font-weight:400;line-height:1.4}
+.fpc-risk{margin:0 18px 12px;padding:8px 12px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.15);border-radius:7px;font-size:12px;color:var(--orange);font-weight:500}
+.fpc-foot{display:flex;justify-content:space-between;padding:9px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:11px;color:var(--dim);font-weight:500}
+.ai-loading-card{padding:22px 18px;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;font-weight:500}
+
+/* RANKINGS */
+.rk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.rk-hdr h2{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.rk-hdr span{font-size:11px;color:var(--muted);font-weight:500}
+.rkt{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.rr{display:grid;grid-template-columns:30px 1fr 78px 68px 76px 58px;align-items:center;gap:6px;padding:11px 16px;border-bottom:1px solid var(--border)}
+.rr:last-child{border-bottom:none}
+.rr.rh{background:var(--surface2);font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+.rnum{font-size:13px;font-weight:700;color:var(--muted)}
+.rteam{display:flex;align-items:center;gap:8px}
+.rlogo{width:26px;height:26px;object-fit:contain}
+.rnm{font-size:13px;font-weight:700}
+.rab{font-size:10px;color:var(--muted);font-weight:500}
+.rpwrc{display:flex;flex-direction:column;gap:3px}
+.rpnum{font-size:13px;font-weight:800;color:var(--accent)}
+.rpbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.rpfill{height:100%;background:var(--accent);border-radius:2px}
+.rrec{font-size:12px;font-weight:500}
+.rsit{font-size:11px;color:var(--muted);font-weight:400}
+.rstatus{font-size:11px;font-weight:700;color:var(--accent)}
+
+.disclaimer{margin-top:24px;padding:12px 16px;background:rgba(251,146,60,.04);border:1px solid rgba(251,146,60,.12);border-radius:10px;font-size:11px;color:var(--dim);line-height:1.6;font-weight:400}
+
+/* SCOUT NOTES */
+.scout-row{padding:6px 14px;border-top:1px solid var(--border);background:var(--surface2)}
+.scout-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;color:var(--dim);user-select:none;padding:2px 0;letter-spacing:.04em;font-weight:600;text-transform:uppercase}
+.scout-toggle:hover{color:var(--muted)}
+.scout-input-wrap{margin-top:6px;display:none}
+.scout-input-wrap.open{display:block}
+.scout-ta{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;padding:8px 10px;resize:none;font-family:inherit;line-height:1.5}
+.scout-ta:focus{outline:none;border-color:var(--accent)}
+.scout-saved{font-size:10px;color:var(--green);margin-top:3px;height:14px;font-weight:600}
+
+/* REFEREE */
+.gc-ref-row{padding:5px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.gc-ref{font-size:10px;color:var(--dim);font-style:italic}
+
+/* MOTIVATION FLAGS */
+.motiv-row{padding:6px 14px;border-top:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap}
+.mflag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.mf-revenge{background:rgba(244,63,94,.12);color:var(--red)}
+.mf-streak-w{background:rgba(16,185,129,.1);color:var(--green)}
+.mf-streak-l{background:rgba(251,146,60,.1);color:var(--orange)}
+.mf-road-trip{background:rgba(0,194,168,.1);color:var(--accent)}
+.mf-home-stand{background:rgba(245,158,11,.1);color:var(--gold)}
+
+/* STANDINGS & INTEL */
+.seed-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(0,194,168,.1);color:var(--accent);border:1px solid rgba(0,194,168,.2);margin-left:5px;vertical-align:middle;text-transform:uppercase;letter-spacing:.04em}
+.seed-e{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.3)}
+.seed-x{background:rgba(245,158,11,.1);color:var(--gold);border-color:rgba(245,158,11,.3)}
+.seed-pi{background:rgba(251,146,60,.1);color:var(--orange);border-color:rgba(251,146,60,.3)}
+.lm-row{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:2px}
+.lm-up{color:var(--green);font-weight:600}
+.lm-dn{color:var(--red);font-weight:600}
+.lm-flat{color:var(--dim)}
+.h2h-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(0,194,168,.08);color:var(--accent);border:1px solid rgba(0,194,168,.18);text-transform:uppercase;letter-spacing:.04em}
+.refresh-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+@media(max-width:700px){.rr{grid-template-columns:26px 1fr 65px 58px}.rr .csit,.rr .cstat{display:none}}
+
+/* TRACK RECORD TAB */
+.tr-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.tr-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 22px;flex:1;min-width:90px;text-align:center;cursor:default;transition:border-color .2s}
+.tr-box:hover{border-color:var(--border2)}
+.tr-val{font-size:28px;font-weight:900;letter-spacing:-.5px}
+.tr-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tr-tiers{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.tr-tier-row{display:grid;grid-template-columns:140px 1fr 80px 80px 60px;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px}
+.tr-tier-row:last-child{border-bottom:none}
+.tr-tier-row.tr-hdr{background:var(--surface2);font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+.tr-hist{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+.tr-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 15px;display:flex;align-items:center;gap:10px;transition:border-color .2s}
+.tr-item:hover{border-color:var(--border2)}
+.tr-item-date{font-size:11px;color:var(--muted);min-width:40px;flex-shrink:0;font-weight:600}
+.tr-item-mu{font-size:11px;color:var(--dim);min-width:88px;flex-shrink:0;font-weight:500}
+.tr-item-pick{font-size:13px;font-weight:800;flex:1;display:flex;align-items:center;gap:7px;letter-spacing:-.1px}
+.tr-result{font-size:12px;font-weight:800;min-width:50px;text-align:right;flex-shrink:0;letter-spacing:.03em}
+.tr-w{color:var(--green)}.tr-l{color:var(--red)}.tr-push{color:var(--muted)}.tr-pend{color:var(--dim);font-weight:500;font-size:11px}
+.tr-score{font-size:11px;color:var(--dim);min-width:56px;text-align:right;flex-shrink:0;font-weight:500}
+.tr-clear{background:none;border:1px solid rgba(244,63,94,.3);color:var(--red);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all .2s}
+.tr-clear:hover{border-color:var(--red);background:rgba(244,63,94,.06)}
+.tr-empty{text-align:center;padding:80px 20px;color:var(--muted);font-size:13px;line-height:1.6}
+
+/* NBA ADVANCED STATS ROW */
+.nba-stats-row{padding:7px 14px;border-top:1px solid var(--border);background:var(--surface2);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.nba-stat{display:flex;flex-direction:column;align-items:center;min-width:44px}
+.nba-stat-val{font-size:12px;font-weight:800;letter-spacing:-.1px}
+.nba-stat-lbl{font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:1px}
+.nba-off{color:var(--green)}
+.nba-def{color:var(--red)}
+.nba-net-pos{color:var(--accent)}
+.nba-net-neg{color:var(--red)}
+.nba-div{color:var(--border2);font-size:14px}
+.nba-elite{color:#10b981}.nba-good{color:#6ee7b7}.nba-avg{color:var(--text)}.nba-below{color:var(--orange)}.nba-poor{color:var(--red)}
+
+/* MULTI-BOOK ODDS */
+.mb-row{padding:8px 14px;border-top:1px solid var(--border);background:var(--surface2);display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.mb-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;width:100%;margin-bottom:2px;font-weight:600}
+.mb-book{display:flex;flex-direction:column;align-items:center;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:4px 9px;min-width:58px;transition:border-color .15s}
+.mb-book-name{font-size:8px;color:var(--dim);margin-bottom:1px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.mb-book-line{font-size:12px;font-weight:800;letter-spacing:-.1px}
+.mb-consensus{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:-.1px}
+.mb-disparity{font-size:10px;color:var(--orange);font-weight:700}
+.mb-best{border-color:var(--green)!important}
+.mb-best .mb-book-line{color:var(--green)}
+.mb-sharp{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--orange);padding:4px 9px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18);border-radius:6px;font-weight:600}
+
+/* LINEUP / AVAILABILITY */
+.lu-row{padding:9px 14px;border-top:1px solid var(--border);background:var(--surface2)}
+.lu-title{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.lu-confirmed{font-size:9px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.lu-tbd{font-size:9px;color:var(--dim);font-weight:600}
+.lu-teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lu-team-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.lu-starters{display:flex;flex-direction:column;gap:3px}
+.lu-player{font-size:11px;display:flex;align-items:center;gap:6px;line-height:1.4;font-weight:500}
+.lu-pos{font-size:9px;color:var(--dim);min-width:24px;font-weight:700;text-transform:uppercase}
+.lu-name{color:var(--text)}
+.lu-out-section{margin-top:7px;padding-top:7px;border-top:1px solid var(--border)}
+.lu-out-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.lu-out-players{display:flex;flex-wrap:wrap;gap:4px}
+.lu-out{background:rgba(244,63,94,.12);color:var(--red);font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;display:flex;align-items:center;gap:3px;text-transform:uppercase;letter-spacing:.03em}
+.lu-doubt{background:rgba(251,146,60,.1);color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.03em}
+.lu-prob{background:rgba(90,115,144,.1);color:var(--muted);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:600}
+
+/* PUBLIC BETTING % */
+.pb-row{padding:9px 14px;border-top:1px solid var(--border);background:var(--surface2)}
+.pb-title{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.pb-title-badge{font-size:8px;background:rgba(0,194,168,.1);color:var(--accent);border:1px solid rgba(0,194,168,.2);padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.05em}
+.pb-market{margin-bottom:7px}
+.pb-market-label{font-size:9px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.pb-bar-wrap{display:flex;align-items:center;gap:8px}
+.pb-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative}
+.pb-fill-away{height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
+.pb-fill-home{height:100%;background:var(--muted);border-radius:3px;transition:width .4s ease}
+.pb-label-away{font-size:10px;font-weight:800;color:var(--accent);min-width:32px;text-align:right}
+.pb-label-home{font-size:10px;font-weight:800;color:var(--muted);min-width:32px}
+.pb-team-away{font-size:9px;color:var(--dim);min-width:28px;text-align:right;font-weight:600}
+.pb-team-home{font-size:9px;color:var(--dim);min-width:28px;font-weight:600}
+.pb-sharp{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--orange);padding:5px 9px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18);border-radius:6px;font-weight:600;margin-top:6px}
+.pb-public{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green);padding:5px 9px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18);border-radius:6px;font-weight:600;margin-top:6px}
+
+/* ─── PLAY OF THE DAY ────────────────────────────────────────────────────── */
+.potd-wrap{max-width:640px;margin:0 auto;padding-top:8px}
+.potd-disclaimer{display:flex;align-items:flex-start;gap:10px;background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.18);border-radius:10px;padding:12px 16px;margin-bottom:28px;font-size:12px;color:var(--muted);line-height:1.55}
+.potd-disclaimer strong{color:var(--orange)}
+.potd-lock-card{background:var(--surface);border:2px solid var(--gold);border-radius:16px;overflow:hidden;box-shadow:0 0 40px rgba(245,158,11,.1)}
+.potd-top{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));padding:18px 22px 14px;border-bottom:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:space-between}
+.potd-crown{font-size:32px;line-height:1}
+.potd-title-block{flex:1;padding:0 14px}
+.potd-label{font-size:10px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px}
+.potd-title{font-size:22px;font-weight:900;letter-spacing:-.4px}
+.potd-lock-badge{font-size:11px;font-weight:800;background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.4);padding:5px 14px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.potd-matchup{display:flex;align-items:center;gap:16px;padding:20px 22px;border-bottom:1px solid var(--border)}
+.potd-team-logo{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,.5))}
+.potd-team-info{flex:1}
+.potd-team-name{font-size:20px;font-weight:900;letter-spacing:-.3px}
+.potd-team-sub{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
+.potd-vs-block{text-align:center;padding:0 8px}
+.potd-vs{font-size:10px;font-weight:800;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.potd-pick-line{font-size:28px;font-weight:900;color:var(--gold);letter-spacing:-.5px;display:block;margin-top:2px}
+.potd-body{padding:20px 22px}
+.potd-reasoning{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:18px;font-style:italic;padding:14px 16px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--gold)}
+.potd-factors{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.potd-factor{display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.45;color:var(--text)}
+.potd-factor-icon{flex-shrink:0;font-size:14px;margin-top:1px}
+.potd-stats-row{display:flex;flex-wrap:wrap;gap:10px;padding:16px 22px;border-top:1px solid var(--border);background:var(--surface2)}
+.potd-stat{display:flex;flex-direction:column;align-items:center;min-width:60px;flex:1}
+.potd-stat-val{font-size:16px;font-weight:900;letter-spacing:-.2px;color:var(--gold)}
+.potd-stat-lbl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:2px;text-align:center}
+.potd-loading{display:flex;align-items:center;gap:14px;padding:48px 22px;color:var(--muted);font-size:14px;font-weight:500}
+.potd-err{padding:48px 22px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ─── PERKY CHATBOT ───────────────────────────────────────────────────────── */
+.perky-btn{position:fixed;bottom:28px;right:28px;z-index:900;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00a896);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(0,194,168,.35),0 0 0 0 rgba(0,194,168,.3);font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;animation:perky-pulse 3s ease-in-out infinite}
+.perky-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,194,168,.5),0 0 0 8px rgba(0,194,168,.08)}
+@keyframes perky-pulse{0%,100%{box-shadow:0 4px 20px rgba(0,194,168,.35),0 0 0 0 rgba(0,194,168,.3)}50%{box-shadow:0 4px 20px rgba(0,194,168,.35),0 0 0 10px rgba(0,194,168,0)}}
+.perky-badge{position:absolute;top:-5px;right:-3px;background:var(--red);color:#fff;font-size:8px;font-weight:800;padding:2px 5px;border-radius:8px;letter-spacing:.04em;display:none}
+.perky-badge.show{display:block}
+.perky-panel{position:fixed;bottom:100px;right:28px;z-index:901;width:360px;max-height:520px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.7),0 0 0 1px rgba(0,194,168,.08);display:flex;flex-direction:column;overflow:hidden;transform:scale(.92) translateY(16px);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .18s ease}
+.perky-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+.perky-head{padding:14px 16px;background:linear-gradient(135deg,rgba(0,194,168,.15),rgba(0,194,168,.05));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.perky-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00a896);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.perky-info{flex:1}
+.perky-name{font-size:14px;font-weight:800;letter-spacing:-.2px;color:var(--accent)}
+.perky-sub{font-size:10px;color:var(--muted);font-weight:500;margin-top:1px}
+.perky-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;border-radius:6px;transition:color .15s;line-height:1}
+.perky-close:hover{color:var(--text)}
+.perky-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.perky-msgs::-webkit-scrollbar{width:4px}.perky-msgs::-webkit-scrollbar-track{background:transparent}.perky-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.perky-msg{display:flex;gap:8px;align-items:flex-start;animation:msg-in .2s ease}
+@keyframes msg-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.perky-msg.user{flex-direction:row-reverse}
+.pm-bubble{max-width:82%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;font-weight:400}
+.pm-bot{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text)}
+.pm-user{background:var(--accent);color:#000;font-weight:600;border-bottom-right-radius:4px}
+.pm-typing{display:flex;gap:4px;align-items:center;padding:12px 14px}
+.pm-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typing-bounce .8s ease-in-out infinite}
+.pm-dot:nth-child(2){animation-delay:.15s}.pm-dot:nth-child(3){animation-delay:.3s}
+@keyframes typing-bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.perky-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px;flex-shrink:0}
+.perky-chip{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.perky-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--adim)}
+.perky-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;background:var(--surface)}
+.perky-input{flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 13px;border-radius:9px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.perky-input:focus{border-color:var(--accent)}
+.perky-send{background:var(--accent);border:none;color:#000;width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.perky-send:hover{background:#00d4b8}
+.perky-send:disabled{background:var(--border);cursor:default}
+@media(max-width:420px){.perky-panel{width:calc(100vw - 24px);right:12px;bottom:88px}}
+
+/* TOOLTIP SYSTEM */
+.tip{position:relative;cursor:help}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#0d1420;border:1px solid #253650;color:#e8f0fe;font-size:11px;font-weight:400;padding:8px 12px;border-radius:8px;width:200px;white-space:normal;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200;line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.tip:hover::after,.tip.tip-open::after{opacity:1}
+
+/* ONBOARDING MODAL */
+.ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.ob-overlay.hide{display:none}
+.ob-box{background:#0d1420;border:1px solid #1e2d45;border-radius:16px;padding:30px;max-width:500px;width:100%;max-height:88vh;overflow-y:auto}
+.ob-title{font-size:22px;font-weight:900;margin-bottom:4px;letter-spacing:-.4px}
+.ob-sub{font-size:13px;color:#5a7390;margin-bottom:22px;font-weight:400}
+.ob-section{margin-bottom:20px}
+.ob-section h3{font-size:10px;font-weight:700;color:#00c2a8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.ob-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.ob-badge{flex-shrink:0;font-size:9px;font-weight:800;padding:3px 9px;border-radius:4px;margin-top:1px;text-transform:uppercase;letter-spacing:.05em}
+.ob-txt{font-size:12px;color:#8ca5c0;line-height:1.55;font-weight:400}
+.ob-close{width:100%;background:#00c2a8;border:none;color:#000;padding:12px;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;font-family:inherit;letter-spacing:-.1px;transition:background .2s}
+.ob-close:hover{background:#00d4b8}
+.btn-help{background:none;border:1px solid #1e2d45;color:#5a7390;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:800;transition:all .2s;flex-shrink:0;font-family:inherit}
+.btn-help:hover{border-color:#00c2a8;color:#00c2a8}
+  </style>
+</head>
+<body>
+
+<div id="ob-overlay" class="ob-overlay hide">
+  <div class="ob-box">
+    <div class="ob-title"><img src="favicon.svg" alt="" style="width:28px;height:28px;vertical-align:middle;margin-right:8px;border-radius:6px"> Welcome to CourtIQ</div>
+    <div class="ob-sub">NBA betting intelligence — here's how to read everything</div>
+
+    <div class="ob-section">
+      <h3>AI Confidence Tiers</h3>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(255,193,7,.15);color:#ffc107;border:1px solid rgba(255,193,7,.35)">🏆 BEST BET</span><span class="ob-txt">Highest conviction. All major factors align. Claude sees a clear edge the public is missing.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.12);color:#4169ff;border:1px solid rgba(65,105,255,.4)">🔵 STRONG</span><span class="ob-txt">Strong edge detected. Worth a normal-size bet.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(0,208,132,.1);color:#00d084;border:1px solid rgba(0,208,132,.35)">🟢 PLAY</span><span class="ob-txt">Moderate edge. Smaller bet recommended.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(100,100,100,.1);color:#666;border:1px solid #2a2a2a">⚪ LEAN</span><span class="ob-txt">Slight lean. Only bet if you independently agree.</span></div>
+    </div>
+
+    <div class="ob-section">
+      <h3>Advanced Stats (NBA.com)</h3>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(0,208,132,.1);color:#00d084">OFF RTG</span><span class="ob-txt">Points scored per 100 possessions. League avg ≈ 113. Higher is better. Elite = 118+.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(255,68,68,.1);color:#ff4444">DEF RTG</span><span class="ob-txt">Points allowed per 100 possessions. League avg ≈ 113. Lower is better defense. Elite = 108 or less.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.1);color:#4169ff">NET</span><span class="ob-txt">OFF RTG minus DEF RTG. The truest measure of team quality. League avg = 0. Above +5 = very good. Above +8 = elite.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(255,193,7,.1);color:#ffc107">PACE</span><span class="ob-txt">Possessions per 48 mins. League avg ≈ 98. Higher pace = more scoring opportunities. Critical for Over/Under bets.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(100,100,100,.1);color:#aaa">eFG%</span><span class="ob-txt">Effective Field Goal %. Accounts for 3-pointers being worth more. League avg ≈ 53%. Higher = more efficient offense.</span></div>
+    </div>
+
+    <div class="ob-section">
+      <h3>Betting Terms</h3>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.1);color:#4169ff">SPREAD</span><span class="ob-txt">Points the favored team must win by. LAL -5.5 means Lakers must win by 6+ for the bet to win.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.1);color:#4169ff">O/U</span><span class="ob-txt">Over/Under. The total combined score. Bet whether the final score goes over or under this number.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.1);color:#4169ff">ML</span><span class="ob-txt">Moneyline. Bet on who wins outright. -150 = bet $150 to win $100. +130 = bet $100 to win $130.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(65,105,255,.1);color:#4169ff">ATS</span><span class="ob-txt">Against The Spread. Did they cover the point spread? 52.4% ATS is the break-even point at standard -110 odds.</span></div>
+      <div class="ob-row"><span class="ob-badge" style="background:rgba(255,68,68,.12);color:#ff4444">B2B</span><span class="ob-txt">Back-to-Back. Team played a game yesterday. Historically costs 3-4 points of performance.</span></div>
+    </div>
+
+    <div class="ob-section">
+      <h3>Power Rating</h3>
+      <div class="ob-txt" style="font-size:12px;color:#aaa;line-height:1.6">A 0–100 score blending win%, home/road record, and NBA net rating. Average team = ~50. The stat model uses this to find edges vs the Vegas line.</div>
+    </div>
+
+    <button class="ob-close" onclick="closeGuide()">Got it — show me today's games →</button>
+  </div>
+</div>
+
+<div id="lov" class="lov">
+  <div class="spin"></div>
+  <div class="ltxt" id="ltxt">Loading today's NBA card...</div>
+</div>
+
+
+<div id="app" style="opacity:0;transition:opacity .3s">
+  <header class="hdr">
+    <div style="display:flex;align-items:center">
+      <div class="logo"><img src="favicon.svg" alt="CourtIQ" class="logo-img"><span class="logo-txt">CourtIQ</span></div>
+      <div class="hmeta">
+        <span class="hdate" id="hdate"></span>
+        <span class="hupd" id="hupd"></span>
+      </div>
+    </div>
+    <div class="hright">
+      <span class="badge" id="gbadge"></span>
+      <div class="ai-status" id="ai-status"></div>
+      <button class="btn-help" onclick="showGuide()" title="How to read CourtIQ">?</button>
+      <button class="btn-g" onclick="init()">↻ Refresh</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tb active" onclick="setTab('games')" id="tb-games">Today's Card</button>
+    <button class="tb" onclick="setTab('picks')" id="tb-picks">Best Bets</button>
+    <button class="tb" onclick="setTab('teams')" id="tb-teams">Power Rankings</button>
+    <button class="tb" onclick="setTab('record')" id="tb-record">Track Record</button>
+    <button class="tb" onclick="setTab('potd')" id="tb-potd">🔒 Play of the Day</button>
+  </nav>
+
+  <main>
+    <section class="tsec active" id="tab-games"><div class="gg" id="gg"></div></section>
+    <section class="tsec" id="tab-picks">
+      <div id="ptop" class="ptop"></div>
+      <div id="plist" class="plist"></div>
+      <div class="disclaimer">⚠️ <strong>For entertainment only.</strong> CourtIQ uses a statistical model combined with Claude AI. Not financial or gambling advice.</div>
+    </section>
+    <section class="tsec" id="tab-teams"><div id="tc"></div></section>
+    <section class="tsec" id="tab-record"><div id="tr-content"></div></section>
+    <section class="tsec" id="tab-potd"><div id="potd-content"></div></section>
+  </main>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// API endpoints
+const ESPN     = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba';
+const ESPNCORE = 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba';
+
+// Claude AI
+const MODEL      = 'claude-sonnet-4-6';
+const MAX_TOKENS = 600;
+const MAX_CONCURRENT_ANALYSIS = 3; // max parallel Claude calls at once
+
+// Power rating algorithm
+const HOME_COURT = 12;   // home court advantage in power points
+const B2B_PEN    = 14;   // back-to-back penalty in power points
+const SCALE      = 0.25; // power → points conversion factor
+const MIN_EDGE   = 1.5;  // minimum edge (pts) to flag a stat pick
+
+// Thresholds
+const TIER_S = 6;    // stat pick tier S: edge >= 6pts
+const TIER_A = 4;    // stat pick tier A: edge >= 4pts
+const TIER_B = 2.5;  // stat pick tier B: edge >= 2.5pts
+const PACE_EDGE_THRESHOLD = 4; // pts above/below O/U to flag pace lean
+
+// Data limits
+const MAX_HISTORY_ENTRIES  = 500;
+const RECENT_PICKS_DISPLAY = 30;
+const NEWS_FETCH_LIMIT     = 60;
+const NEWS_PROMPT_LIMIT    = 10;
+const PACE_SAMPLE_GAMES    = 15;
+const RECENT_FORM_GAMES    = 10;
+
+// NBA Stats
+const NBA_STATS_SEASON = '2024-25';
+
+// Refresh & line movement
+const REFRESH_INTERVAL_MS       = 15 * 60 * 1000; // 15 minutes
+const LINE_MOVE_REANALYZE_DELTA = 1;   // pts: re-run Claude if line moves this much
+const LINE_MOVE_DISPLAY_DELTA   = 0.5; // pts: show movement indicator on card
+
+// Books to display (in priority order for "best line" display)
+const PRIORITY_BOOKS = ['draftkings','fanduel','betmgm','caesars','pointsbet','williamhill_us','bovada'];
+const BOOK_LABELS    = { draftkings:'DraftKings', fanduel:'FanDuel', betmgm:'BetMGM', caesars:'Caesars', pointsbet:'PointsBet', williamhill_us:'WH', bovada:'Bovada' };
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let S = { games:[], analyses:{}, analyzing:new Set(), notes:{}, standings:{}, openingOdds:{}, nbaStats:{}, multiOdds:{}, publicBetting:{}, refreshTimer:null };
+
+// ─── NBA ABBREVIATION MAP ─────────────────────────────────────────────────────
+// ESPN uses different abbreviations than NBA Stats for some teams
+const ESPN_TO_NBA_ABBR = {
+  'GS': 'GSW', 'NO': 'NOP', 'NY': 'NYK', 'SA': 'SAS',
+  'PHO': 'PHX', 'UTAH': 'UTA', 'WSH': 'WAS', 'UTH': 'UTA'
+};
+function getNBAStats(team) {
+  const abbr = ESPN_TO_NBA_ABBR[team.abbr] || team.abbr;
+  return S.nbaStats[abbr] || null;
+}
+
+// Map The Odds API full team names → ESPN abbreviations for matching
+const ODDS_TEAM_TO_ABBR = {
+  'Atlanta Hawks':'ATL','Boston Celtics':'BOS','Brooklyn Nets':'BKN',
+  'Charlotte Hornets':'CHA','Chicago Bulls':'CHI','Cleveland Cavaliers':'CLE',
+  'Dallas Mavericks':'DAL','Denver Nuggets':'DEN','Detroit Pistons':'DET',
+  'Golden State Warriors':'GS','Houston Rockets':'HOU','Indiana Pacers':'IND',
+  'Los Angeles Clippers':'LAC','Los Angeles Lakers':'LAL','Memphis Grizzlies':'MEM',
+  'Miami Heat':'MIA','Milwaukee Bucks':'MIL','Minnesota Timberwolves':'MIN',
+  'New Orleans Pelicans':'NO','New York Knicks':'NY','Oklahoma City Thunder':'OKC',
+  'Orlando Magic':'ORL','Philadelphia 76ers':'PHI','Phoenix Suns':'PHO',
+  'Portland Trail Blazers':'POR','Sacramento Kings':'SAC','San Antonio Spurs':'SA',
+  'Toronto Raptors':'TOR','Utah Jazz':'UTAH','Washington Wizards':'WSH'
+};
+
+// Action Network uses different abbreviations for some teams
+const ACTION_TO_ESPN_ABBR = {
+  'GSW':'GS', 'NOP':'NO', 'NYK':'NY', 'SAS':'SA',
+  'PHX':'PHO', 'UTA':'UTAH', 'WAS':'WSH', 'BKN':'BKN',
+  'OKC':'OKC', 'MEM':'MEM', 'LAL':'LAL', 'LAC':'LAC'
+};
+
+// ─── REFEREE TENDENCIES (static lookup) ───────────────────────────────────────
+const REF_NOTES = {
+  'Tony Brothers':   'whistle-heavy · high FTA games',
+  'Scott Foster':    'let-it-play · fast pace tendency',
+  'Marc Davis':      'tight game management · high fouls',
+  'James Capers':    'physical play allowed · low FTA',
+  'Jason Phillips':  'consistent whistle · mid foul rate',
+  'Kane Fitzgerald': 'tight game · elevated FTA',
+  'John Goble':      'let-it-play · favor offense',
+  'Eric Lewis':      'physical play · low stoppages',
+  'Rodney Mott':     'tight whistle · high foul count',
+  'Tom Washington':  'consistent · mid foul rate',
+  'Zach Zarba':      'whistle-heavy · favors drives',
+  'Derek Richardson':'physical play allowed · under lean',
+};
+
+// ─── TRACK RECORD ─────────────────────────────────────────────────────────────
+const LS_HIST = 'courtiq_history';
+function loadHistory(){ try{return JSON.parse(localStorage.getItem(LS_HIST)||'[]');}catch{return[];} }
+function saveHistory(arr){ try{localStorage.setItem(LS_HIST,JSON.stringify(arr.slice(0,MAX_HISTORY_ENTRIES)));}catch{} }
+
+function parsePickStr(pickStr){
+  const m=pickStr.trim().match(/^([A-Z0-9]+)\s+(.+)$/);
+  if(!m) return null;
+  const abbr=m[1], sp=m[2].trim();
+  const spread=(sp==='PK')?0:parseFloat(sp);
+  return isNaN(spread)?null:{abbr,spread};
+}
+
+function savePick(game, analysis){
+  if(!analysis||analysis.skipPick||analysis.pick==='PASS') return;
+  const h=loadHistory();
+  const today=ds(new Date());
+  const entryId=`${game.id}_${today}`;
+  if(h.find(e=>e.id===entryId)) return;
+  const p=parsePickStr(analysis.pick);
+  h.unshift({
+    id:entryId, eventId:game.id, date:today,
+    matchup:`${game.away.abbr} @ ${game.home.abbr}`,
+    homeAbbr:game.home.abbr, awayAbbr:game.away.abbr,
+    pick:analysis.pick, confidence:analysis.confidence,
+    spread:p?p.spread:null, pickAbbr:p?p.abbr:null,
+    result:null, finalScore:null
+  });
+  saveHistory(h);
+}
+
+function resolveResults(yestEvents){
+  const h=loadHistory();
+  const today=ds(new Date());
+  let changed=false;
+  const scoreMap={};
+  (yestEvents||[]).forEach(ev=>{
+    const comp=ev.competitions?.[0]; if(!comp) return;
+    const hC=(comp.competitors||[]).find(c=>c.homeAway==='home');
+    const aC=(comp.competitors||[]).find(c=>c.homeAway==='away');
+    if(!hC||!aC) return;
+    scoreMap[ev.id]={
+      homeAbbr:hC.team?.abbreviation||'', awayAbbr:aC.team?.abbreviation||'',
+      homeScore:+(hC.score?.value??hC.score??0),
+      awayScore:+(aC.score?.value??aC.score??0),
+      completed:comp.status?.type?.completed===true
+    };
+  });
+  for(const entry of h){
+    if(entry.result!==null) continue;
+    if(entry.date>=today) continue;
+    const sc=scoreMap[entry.eventId];
+    if(!sc||!sc.completed) continue;
+    const p=parsePickStr(entry.pick); if(!p) continue;
+    const pickIsHome=(p.abbr===sc.homeAbbr);
+    const pickScore=pickIsHome?sc.homeScore:sc.awayScore;
+    const oppScore =pickIsHome?sc.awayScore:sc.homeScore;
+    const margin=pickScore-oppScore;
+    const diff=margin+p.spread;
+    entry.result=diff>0?'W':diff<0?'L':'P';
+    entry.finalScore=pickIsHome?`${sc.homeScore}-${sc.awayScore}`:`${sc.awayScore}-${sc.homeScore}`;
+    changed=true;
+  }
+  if(changed) saveHistory(h);
+}
+
+function computeRecord(history){
+  const graded=history.filter(h=>h.result!==null);
+  const w=graded.filter(h=>h.result==='W').length;
+  const l=graded.filter(h=>h.result==='L').length;
+  const p=graded.filter(h=>h.result==='P').length;
+  const net=Math.round(((w*(100/110))-l)*100)/100;
+  const winPct=(w+l)>0?Math.round(w/(w+l)*1000)/10:null;
+  const tiers=['Best Bet','Strong Play','Play','Lean'];
+  const byTier={};
+  tiers.forEach(t=>{
+    const tg=graded.filter(h=>h.confidence===t);
+    const tw=tg.filter(h=>h.result==='W').length;
+    const tl=tg.filter(h=>h.result==='L').length;
+    byTier[t]={w:tw,l:tl,p:tg.filter(h=>h.result==='P').length,total:tg.length,
+      winPct:(tw+tl)>0?Math.round(tw/(tw+tl)*1000)/10:null};
+  });
+  return{w,l,p,net,winPct,graded:graded.length,pending:history.filter(h=>h.result===null).length,byTier};
+}
+
+function buildCalibration(){
+  const rec=computeRecord(loadHistory());
+  if(rec.graded<3) return '';
+  const lines=[`COURTIQ CALIBRATION (${rec.graded} graded picks):`,
+    `Overall: ${rec.w}-${rec.l}-${rec.p} (${rec.winPct??'—'}% ATS) | Net: ${rec.net>=0?'+':''}${rec.net}u`];
+  ['Best Bet','Strong Play','Play','Lean'].forEach(t=>{
+    const b=rec.byTier[t]; if(!b.total) return;
+    lines.push(`  ${t}: ${b.w}-${b.l}-${b.p} (${b.winPct??'—'}%)`);
+  });
+  lines.push('Calibrate: if a tier is underperforming below 50%, be more selective there.');
+  return lines.join('\n');
+}
+
+function clearHistory(){ if(confirm('Clear all pick history?')){saveHistory([]);renderTrackRecord();} }
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+const pr    = s => { const[w,l]=(s||'0-0').split('-').map(Number); return{w:w||0,l:l||0}; };
+const wp    = r => (r.w+r.l)?r.w/(r.w+r.l):0.5;
+const fs    = n => n==null?'—':n===0?'PK':n>0?`+${n}`:`${n}`;
+const fml   = n => n==null?'—':n>0?`+${n}`:`${n}`;
+const fpct  = p => (p*100).toFixed(0)+'%';
+const ds    = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+const ftlong= d => d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const ft    = iso => new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZoneName:'short',hour12:true});
+// Route ESPN calls through our server-side cache proxy.
+// Direct calls hit ESPN once per user — this makes all users share one cached response.
+const fetchJ= async url => {
+  const isESPN = url.startsWith('https://site.api.espn.com') || url.startsWith('https://sports.core.api.espn.com');
+  const target = isESPN ? `/api/espn?url=${encodeURIComponent(url)}` : url;
+  const r = await fetch(target);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+};
+
+// ─── NOTES & MOTIVATION ──────────────────────────────────────────────────────
+function loadNotes(){ try{return JSON.parse(localStorage.getItem('courtiq_notes')||'{}');}catch{return{};} }
+function saveNote(gid,text){
+  S.notes[gid]=text;
+  try{localStorage.setItem('courtiq_notes',JSON.stringify(S.notes));}catch{}
+  const el=document.getElementById(`scout-saved-${gid}`);
+  if(el){el.textContent='✓ Saved';setTimeout(()=>{el.textContent='';},1500);}
+}
+function toggleScout(gid){
+  const w=document.getElementById(`scout-wrap-${gid}`);
+  if(w) w.classList.toggle('open');
+}
+function detectFlags(team,opponentAbbr){
+  const flags=[],rec=team.recent||[];
+  if(rec.length>=3&&rec.slice(0,3).every(g=>g.won)){
+    const cnt=[...rec].findIndex(g=>!g.won);
+    flags.push({cls:'mf-streak-w',label:`🔥 ${cnt===-1?rec.length:cnt}-Game Win Streak`});
+  }
+  if(rec.length>=3&&rec.slice(0,3).every(g=>!g.won))
+    flags.push({cls:'mf-streak-l',label:'📉 3-Game Skid'});
+  if(!team.isHome&&team.roadStreak>=4)
+    flags.push({cls:'mf-road-trip',label:`✈️ Road Trip G${team.roadStreak}`});
+  if(team.isHome&&rec.length>=3&&rec.slice(0,3).every(g=>g.isHome))
+    flags.push({cls:'mf-home-stand',label:'🏠 Home Stand'});
+  const lossOpps=rec.filter(g=>!g.won).map(g=>(g.opp||'').toLowerCase());
+  if(opponentAbbr&&lossOpps.some(o=>o.includes(opponentAbbr.toLowerCase().slice(0,3))))
+    flags.push({cls:'mf-revenge',label:'⚔️ Revenge Spot'});
+  return flags;
+}
+
+// ─── ESPN APIs ────────────────────────────────────────────────────────────────
+async function fetchStandings(){
+  try{
+    const d=await fetchJ('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings');
+    const m={};
+    (d.children||[]).forEach(conf=>{
+      const cname=(conf.name||'').includes('East')?'East':'West';
+      (conf.standings?.entries||[]).forEach((e,i)=>{
+        const tid=e.team?.id; if(!tid)return;
+        const st={};
+        (e.stats||[]).forEach(s=>{st[s.name]=s.value;});
+        const gb=parseFloat(st.gamesBehind||st.gamesBack||0);
+        const ci=(st.clinchIndicator||'').toString().toLowerCase();
+        let clinch='';
+        if(ci==='e') clinch='ELIM';
+        else if(ci==='z') clinch='CONF';
+        else if(ci==='y') clinch='DIV';
+        else if(ci==='x'||ci==='p') clinch='CLINCHED';
+        m[tid]={rank:i+1,conf:cname,gb,clinch};
+      });
+    });
+    return m;
+  }catch{return{};}
+}
+
+async function fetchCoreOdds(eventId) {
+  try {
+    const d = await fetchJ(`${ESPNCORE}/events/${eventId}/competitions/${eventId}/odds`);
+    const items = d.items || (d.provider?[d]:[]);
+    if (!items.length) return null;
+    const o = items[0];
+    const spread = parseFloat(o.spread);
+    const ou     = parseFloat(o.overUnder);
+    const homeFav= o.homeTeamOdds?.favorite===true;
+    const awayFav= o.awayTeamOdds?.favorite===true;
+    let homeSpread;
+    if (!isNaN(spread)) {
+      if (homeFav)       homeSpread = -Math.abs(spread);
+      else if (awayFav)  homeSpread =  Math.abs(spread);
+      else homeSpread = 0;
+    } else homeSpread = 0;
+    return {
+      homeSpread,
+      overUnder:  isNaN(ou)?null:ou,
+      homeML:     o.homeTeamOdds?.moneyLine??null,
+      awayML:     o.awayTeamOdds?.moneyLine??null,
+      overOdds:   o.overOdds??-110,
+      underOdds:  o.underOdds??-110,
+      spreadOdds: o.homeTeamOdds?.spreadOdds??-110,
+      homeFav, awayFav,
+      provider:   o.provider?.name||'ESPN'
+    };
+  } catch { return null; }
+}
+
+async function fetchInjuries() {
+  try {
+    const d = await fetchJ(`${ESPN}/injuries`);
+    const m = {};
+    (d.injuries||[]).forEach(te=>{
+      const tid=te.team?.id; if(!tid)return;
+      m[tid]=(te.injuries||[]).map(i=>({
+        player: i.athlete?.displayName||'?',
+        status: i.status||'',
+        type:   i.details?.type||''
+      }));
+    });
+    return m;
+  } catch { return {}; }
+}
+
+async function fetchTeamSched(tid) {
+  try {
+    const d = await fetchJ(`${ESPN}/teams/${tid}/schedule`);
+    let atsCovers=0, atsTotal=0;
+    const done = (d.events||[])
+      .filter(e=>e.competitions?.[0]?.status?.type?.completed)
+      .map(e=>{
+        const c=e.competitions[0];
+        const mine=c.competitors.find(x=>x.team?.id===String(tid));
+        const opp =c.competitors.find(x=>x.team?.id!==String(tid));
+        const isHome=mine?.homeAway==='home';
+        const margin=+(mine?.score?.value??mine?.score??0) - +(opp?.score?.value??opp?.score??0);
+        // ATS: extract closing spread from game odds
+        const go=c.odds?.[0];
+        if(go){
+          const sp=parseFloat(go.spread);
+          if(!isNaN(sp)&&sp!==0){
+            const hFav=go.homeTeamOdds?.favorite===true, aFav=go.awayTeamOdds?.favorite===true;
+            const hs=hFav?-Math.abs(sp):aFav?Math.abs(sp):0;
+            // team's line from their perspective; covers if margin + teamLine > 0
+            const diff=isHome?(margin+hs):(margin-hs);
+            if(diff!==0){atsTotal++;if(diff>0)atsCovers++;}
+          }
+        }
+        const pts=+(mine?.score?.value??mine?.score??0), oppPts=+(opp?.score?.value??opp?.score??0);
+        return { date:new Date(e.date), won:mine?.winner===true, margin, isHome, opp:opp?.team?.shortDisplayName||'', oppId:opp?.team?.id||'', pts, oppPts };
+      })
+      .sort((a,b)=>b.date-a.date);
+    const last=done[0];
+
+    const restDays=last?Math.max(0,Math.floor((new Date()-last.date)/86400000)):null;
+    let roadStreak=0; for(const g of done){if(!g.isHome)roadStreak++;else break;}
+    // Pace proxy: avg points scored + allowed per game (last 15)
+    const sample=done.slice(0,PACE_SAMPLE_GAMES);
+    const avgPts   = sample.length?Math.round(sample.reduce((s,g)=>s+g.pts,0)/sample.length*10)/10:null;
+    const avgOppPts= sample.length?Math.round(sample.reduce((s,g)=>s+g.oppPts,0)/sample.length*10)/10:null;
+    return {restDays,roadStreak,recent:done.slice(0,10),ats:{covers:atsCovers,total:atsTotal},avgPts,avgOppPts};
+  } catch { return {restDays:null,roadStreak:0,recent:[],ats:{covers:0,total:0},avgPts:null,avgOppPts:null}; }
+}
+
+async function fetchNews() {
+  try {
+    const d = await fetchJ(`${ESPN}/news?limit=${NEWS_FETCH_LIMIT}`);
+    return (d.articles||[]).map(a=>({
+      headline:a.headline,
+      teamIds:(a.categories||[]).filter(c=>c.type==='team').map(c=>String(c.id))
+    }));
+  } catch { return []; }
+}
+
+async function fetchNBAAdvancedStats() {
+  try {
+    const base = 'https://stats.nba.com/stats/leaguedashteamstats';
+    const params = `MeasureType=Advanced&PerMode=PerGame&Season=${NBA_STATS_SEASON}&SeasonType=Regular+Season&LastNGames=0&LeagueID=00&PaceAdjust=N&PlusMinus=N&Rank=N`;
+    const url = `/api/nba?url=${encodeURIComponent(`${base}?${params}`)}`;
+    const d = await fetch(url).then(r => r.json());
+    const rs = d.resultSets?.[0];
+    if (!rs) return {};
+    const idx = h => rs.headers.indexOf(h);
+    const iAbbr = idx('TEAM_ABBREVIATION');
+    const iOff  = idx('OFF_RATING');
+    const iDef  = idx('DEF_RATING');
+    const iNet  = idx('NET_RATING');
+    const iPace = idx('PACE');
+    const iEfg  = idx('EFG_PCT');
+    const iTs   = idx('TS_PCT');
+    const iTov  = idx('TM_TOV_PCT');
+    const iOreb = idx('OREB_PCT');
+    const stats = {};
+    for (const row of rs.rowSet) {
+      const abbr = row[iAbbr];
+      stats[abbr] = {
+        offRating: Math.round(row[iOff] * 10) / 10,
+        defRating: Math.round(row[iDef] * 10) / 10,
+        netRating: Math.round(row[iNet] * 10) / 10,
+        pace:      Math.round(row[iPace] * 10) / 10,
+        efg:       row[iEfg],
+        ts:        row[iTs],
+        tovPct:    row[iTov],
+        orebPct:   row[iOreb]
+      };
+    }
+    return stats;
+  } catch(e) {
+    console.warn('NBA Stats fetch failed:', e.message);
+    return {};
+  }
+}
+
+async function fetchMultiBookOdds() {
+  try {
+    const r = await fetch('/api/odds');
+    const d = await r.json();
+    if (!d.games?.length) return {};
+    if (d.remaining) console.log(`Odds API: ${d.remaining} requests remaining`);
+
+    const result = {};
+    for (const game of d.games) {
+      const homeAbbr = ODDS_TEAM_TO_ABBR[game.home_team];
+      const awayAbbr = ODDS_TEAM_TO_ABBR[game.away_team];
+      if (!homeAbbr || !awayAbbr) continue;
+
+      // key by "AWAY@HOME" to match ESPN games
+      const key = `${awayAbbr}@${homeAbbr}`;
+
+      // Aggregate across all bookmakers
+      const spreads = [], totals = [], homeMLS = [], awayMLS = [];
+      for (const bk of (game.bookmakers || [])) {
+        for (const mkt of (bk.markets || [])) {
+          if (mkt.key === 'spreads') {
+            const homeOut = mkt.outcomes.find(o => o.name === game.home_team);
+            if (homeOut) spreads.push({ book: bk.key, title: bk.title, homeSpread: homeOut.point, price: homeOut.price });
+          }
+          if (mkt.key === 'totals') {
+            const over = mkt.outcomes.find(o => o.name === 'Over');
+            if (over) totals.push({ book: bk.key, title: bk.title, total: over.point, overPrice: over.price });
+          }
+          if (mkt.key === 'h2h') {
+            const homeOut = mkt.outcomes.find(o => o.name === game.home_team);
+            const awayOut = mkt.outcomes.find(o => o.name === game.away_team);
+            if (homeOut) homeMLS.push({ book: bk.key, title: bk.title, ml: homeOut.price });
+            if (awayOut) awayMLS.push({ book: bk.key, title: bk.title, ml: awayOut.price });
+          }
+        }
+      }
+
+      if (!spreads.length) continue;
+
+      // Consensus spread (most common line across books)
+      const spreadCounts = {};
+      spreads.forEach(s => { spreadCounts[s.homeSpread] = (spreadCounts[s.homeSpread]||0)+1; });
+      const consensusSpread = parseFloat(Object.entries(spreadCounts).sort((a,b)=>b[1]-a[1])[0][0]);
+
+      // Best spread for home team (most favorable = lowest/most negative for fade, highest for back)
+      // Show range: tightest and loosest lines
+      const spreadValues = spreads.map(s => s.homeSpread);
+      const minSpread = Math.min(...spreadValues);
+      const maxSpread = Math.max(...spreadValues);
+      const lineDisparity = Math.abs(maxSpread - minSpread);
+
+      // Best available ML
+      const bestHomeML = homeMLS.length ? homeMLS.reduce((best,b) => b.ml > best.ml ? b : best) : null;
+      const bestAwayML = awayMLS.length ? awayMLS.reduce((best,b) => b.ml > best.ml ? b : best) : null;
+
+      // Consensus total
+      const totalCounts = {};
+      totals.forEach(t => { totalCounts[t.total] = (totalCounts[t.total]||0)+1; });
+      const consensusTotal = totals.length ? parseFloat(Object.entries(totalCounts).sort((a,b)=>b[1]-a[1])[0][0]) : null;
+
+      result[key] = {
+        consensusSpread,
+        consensusTotal,
+        lineDisparity,
+        bookCount: spreads.length,
+        spreads,
+        bestHomeML,
+        bestAwayML,
+        minSpread,
+        maxSpread,
+        // Sharp indicator: line has moved from consensus (books disagree)
+        sharpAction: lineDisparity >= 1
+      };
+    }
+    return result;
+  } catch(e) {
+    console.warn('Multi-book odds fetch failed:', e.message);
+    return {};
+  }
+}
+
+async function fetchPublicBetting() {
+  try {
+    const r = await fetch('/api/public-betting');
+    const d = await r.json();
+    if (!d.games?.length) return {};
+
+    const result = {};
+    for (const game of d.games) {
+      const teams = game.teams || [];
+      if (teams.length < 2) continue;
+
+      // Find home and away teams — check both orders
+      let awayTeam = null, homeTeam = null;
+      for (const t of teams) {
+        // Normalize abbreviation to ESPN format
+        const espnAbbr = ACTION_TO_ESPN_ABBR[t.abbr] || t.abbr;
+        t._espnAbbr = espnAbbr;
+      }
+
+      // Action Network: teams[0] = away, teams[1] = home typically
+      // But verify by matching against our game data later
+      const t0 = teams[0], t1 = teams[1];
+      const key0 = `${t0._espnAbbr}@${t1._espnAbbr}`;
+      const key1 = `${t1._espnAbbr}@${t0._espnAbbr}`;
+
+      const buildEntry = (away, home) => ({
+        away: {
+          abbr: away._espnAbbr,
+          spreadBetPct: away.spread_bet_pct ?? null,
+          spreadMoneyPct: away.spread_money_pct ?? null,
+          mlBetPct: away.ml_bet_pct ?? null
+        },
+        home: {
+          abbr: home._espnAbbr,
+          spreadBetPct: home.spread_bet_pct ?? null,
+          spreadMoneyPct: home.spread_money_pct ?? null,
+          mlBetPct: home.ml_bet_pct ?? null
+        }
+      });
+
+      // Store both possible key orderings so we match regardless
+      result[key0] = buildEntry(t0, t1);
+      result[key1] = buildEntry(t1, t0);
+    }
+    return result;
+  } catch(e) {
+    console.warn('Public betting fetch failed:', e.message);
+    return {};
+  }
+}
+
+async function fetchGameLineup(gameId) {
+  try {
+    const url = `${ESPN}/summary?event=${gameId}`;
+    const d = await fetchJ(url);
+    const rosters = d.rosters || d.boxscore?.players || [];
+    const result = { home: { starters: [], active: [] }, away: { starters: [], active: [] }, confirmed: false };
+
+    for (const side of rosters) {
+      const entries = side.entries || side.players || [];
+      const isHome = side.homeAway === 'home' || side.team?.homeAway === 'home';
+      const target = isHome ? result.home : result.away;
+
+      for (const e of entries) {
+        const name = e.athlete?.displayName || e.athlete?.shortName || '';
+        const pos  = e.athlete?.position?.abbreviation || '';
+        const jersey = e.jersey || e.athlete?.jersey || '';
+        if (!name) continue;
+
+        if (e.starter) {
+          target.starters.push({ name, pos, jersey });
+          result.confirmed = true;
+        }
+        if (e.active !== false) {
+          target.active.push({ name, pos });
+        }
+      }
+    }
+    return result;
+  } catch(e) {
+    return null;
+  }
+}
+
+function computeH2H(schedule, opponentId){
+  const games=(schedule.recent||[]).filter(g=>g.oppId===String(opponentId));
+  if(!games.length)return null;
+  const wins=games.filter(g=>g.won).length;
+  const last=games[0];
+  const avgMargin=Math.round(games.reduce((s,g)=>s+g.margin,0)/games.length*10)/10;
+  return{wins,losses:games.length-wins,total:games.length,lastMargin:last?.margin,lastWon:last?.won,avgMargin};
+}
+
+// ─── PARSING ──────────────────────────────────────────────────────────────────
+function parseTeam(comp, yestSet) {
+  const t=comp.team||{};
+  const rec=n=>{ const r=(comp.records||[]).find(x=>x.type===n||x.name?.toLowerCase()===n); return r?pr(r.summary):{w:0,l:0}; };
+  return {
+    id:t.id, name:t.shortDisplayName||t.name||t.displayName,
+    fullName:t.displayName, abbr:t.abbreviation, logo:t.logo,
+    isHome:comp.homeAway==='home', isB2B:yestSet.has(t.id),
+    overall:rec('total')||rec('overall'), homeRecord:rec('home'), roadRecord:rec('road'),
+    power:0, restDays:null, roadStreak:0, recent:[]
+  };
+}
+function calcPower(t) {
+  const ov = wp(t.overall);
+  const sit = t.isHome ? wp(t.homeRecord) : wp(t.roadRecord);
+  const hasSit = (t.homeRecord.w + t.homeRecord.l + t.roadRecord.w + t.roadRecord.l) > 0;
+  const winPctPower = Math.round((hasSit ? ov * 0.55 + sit * 0.45 : ov) * 1000) / 10;
+  // Blend in NET_RATING (40% weight) if NBA data available
+  // NBA net ratings typically range -15 to +15; normalize to 0–100 power scale
+  const ns = getNBAStats(t);
+  if (ns?.netRating != null) {
+    const netPower = Math.max(10, Math.min(95, 50 + ns.netRating * 2.5));
+    return Math.round((winPctPower * 0.6 + netPower * 0.4) * 10) / 10;
+  }
+  return winPctPower;
+}
+
+// ─── ALGORITHM ───────────────────────────────────────────────────────────────
+function statPick(game){
+  const {home,away,odds}=game; if(!odds)return null;
+  let hp=home.power,ap=away.power;
+  if(home.isB2B)hp-=B2B_PEN; if(away.isB2B)ap-=B2B_PEN;
+  const edge=odds.homeSpread-(-(hp+HOME_COURT-ap)*SCALE);
+  const abs=Math.abs(edge); if(abs<MIN_EDGE)return null;
+  const pickHome=edge>0;
+  return {
+    tier:abs>=TIER_S?'S':abs>=TIER_A?'A':abs>=TIER_B?'B':'C',
+    edge:Math.round(abs*10)/10,
+    pickTeam:pickHome?home:away,
+    pickSpread:pickHome?odds.homeSpread:-odds.homeSpread,
+    pickHome
+  };
+}
+
+// ─── PROMPT FORMATTERS (extracted for clarity) ────────────────────────────────
+
+// Format injury list for prompt context
+function formatInjuryList(injuries) {
+  if (!injuries?.length) return 'None reported';
+  return injuries.map(i => `${i.player}(${i.status}${i.type ? ',' + i.type : ''})`).join(' | ');
+}
+
+// Format recent game form for prompt context (last N games with margins)
+function formatRecentForm(team) {
+  if (!team.recent?.length) return 'N/A';
+  return team.recent.slice(0, RECENT_FORM_GAMES)
+    .map(x => `${x.won ? 'W' : 'L'}${x.margin > 0 ? '+' : ''}${x.margin}${x.isHome ? ' H' : ' A'} vs ${x.opp}`)
+    .join(', ');
+}
+
+// Format rest/fatigue situation
+function formatRestSituation(team) {
+  if (team.restDays === 0) return 'BACK-TO-BACK';
+  if (team.restDays === 1) return '1 day rest';
+  if (team.restDays != null) return `${team.restDays}d rest`;
+  return 'unknown';
+}
+
+// Flag road trip games for context
+function formatRoadTripNote(team) {
+  return (!team.isHome && team.roadStreak > 1) ? `(game ${team.roadStreak} of road trip)` : '';
+}
+
+// Format standings rank/conference for prompt
+function formatStandingsLine(st) {
+  if (!st) return 'N/A';
+  return `#${st.rank} ${st.conf}${st.gb > 0 ? ` (${st.gb} GB)` : ' (1st)'}${st.clinch ? ' [' + st.clinch + ']' : ''}`;
+}
+
+// Translate standings into playoff motivation context
+function formatPlayoffContext(st) {
+  if (!st) return '';
+  if (st.clinch === 'ELIM') return 'ELIMINATED — nothing to play for';
+  if (st.clinch) return 'Playoff berth clinched';
+  if (st.rank <= 6) return `Locked in playoff (${st.conf} #${st.rank})`;
+  if (st.rank <= 10) return `Play-in spot (${st.conf} #${st.rank}, ${st.gb} GB from #6)`;
+  return `Outside playoff picture (${st.conf} #${st.rank}, ${st.gb} GB from cutoff)`;
+}
+
+// Format ATS record for prompt
+function formatATSRecord(ats) {
+  if (!ats || ats.total < 5) return 'Not enough data';
+  return `${ats.covers}-${ats.total - ats.covers} (${fpct(ats.covers / ats.total)}) vs spread`;
+}
+
+// ─── CLAUDE ───────────────────────────────────────────────────────────────────
+function buildPrompt(g){
+  const{home,away,odds}=g;
+  const awayNBA = getNBAStats(away);
+  const homeNBA = getNBAStats(home);
+  const scoutNote=(S.notes[g.id]||'').trim();
+  const calibration=buildCalibration();
+  const oddsLine=odds?`Spread: ${home.abbr} ${fs(odds.homeSpread)} | O/U: ${odds.overUnder??'N/A'} | ${away.abbr} ML: ${fml(odds.awayML)} / ${home.abbr} ML: ${fml(odds.homeML)} | Provider: ${odds.provider||'ESPN'}`:'No odds posted yet';
+  const newsStr=(g.news||[]).map(n=>n.headline).slice(0,NEWS_PROMPT_LIMIT).join('\n')||'No news';
+  const picks=odds?`"${away.abbr} ${fs(-odds.homeSpread)}" or "${home.abbr} ${fs(odds.homeSpread)}" or "PASS"`:`"PASS"`;
+
+  // Standings context
+  const hSt=S.standings[home.id], aSt=S.standings[away.id];
+
+  // H2H this season
+  const h2h=g.h2h;
+  const fh2h=h2h?`${h2h.wins}-${h2h.losses} this season in ${h2h.total} meetings, avg margin ${h2h.avgMargin>0?'+':''}${h2h.avgMargin}`:'No meetings yet this season';
+  const fh2hlast=h2h&&h2h.total>0?`Last meeting: ${h2h.lastWon?home.name+' won':away.name+' won'} by ${Math.abs(h2h.lastMargin)}`:'';
+
+  // Line movement
+  const opening=S.openingOdds[g.id];
+  const lineMoved=opening&&odds&&opening.homeSpread!==null&&odds.homeSpread!==null&&Math.abs(odds.homeSpread-opening.homeSpread)>=LINE_MOVE_DISPLAY_DELTA;
+  const flineMove=lineMoved?`MOVED: opened ${home.abbr} ${fs(opening.homeSpread)} → now ${fs(odds.homeSpread)} (${odds.homeSpread<opening.homeSpread?home.abbr+' getting sharper action':away.abbr+' getting sharper action'})`:'Line stable since open';
+
+  return `You are an elite NBA analyst and sharp sports bettor. Analyze this game and generate a sharp betting pick.
+
+GAME: ${away.fullName} @ ${home.fullName}
+TIME: ${g.time} | VENUE: ${g.venue}
+
+RECORDS:
+• ${away.name} (AWAY): ${away.overall.w}-${away.overall.l} | Road: ${away.roadRecord.w}-${away.roadRecord.l} | PWR: ${away.power}
+• ${home.name} (HOME): ${home.overall.w}-${home.overall.l} | Home: ${home.homeRecord.w}-${home.homeRecord.l} | PWR: ${home.power}
+
+ADVANCED STATS (NBA.com, season-to-date):
+• ${away.name}: OFF ${awayNBA?.offRating??'N/A'} | DEF ${awayNBA?.defRating??'N/A'} | NET ${awayNBA?.netRating!=null?(awayNBA.netRating>=0?'+':'')+awayNBA.netRating:'N/A'} | Pace ${awayNBA?.pace??'N/A'} | eFG ${awayNBA?.efg!=null?((awayNBA.efg*100).toFixed(1)+'%'):'N/A'} | TOV% ${awayNBA?.tovPct!=null?((awayNBA.tovPct*100).toFixed(1)+'%'):'N/A'}
+• ${home.name}: OFF ${homeNBA?.offRating??'N/A'} | DEF ${homeNBA?.defRating??'N/A'} | NET ${homeNBA?.netRating!=null?(homeNBA.netRating>=0?'+':'')+homeNBA.netRating:'N/A'} | Pace ${homeNBA?.pace??'N/A'} | eFG ${homeNBA?.efg!=null?((homeNBA.efg*100).toFixed(1)+'%'):'N/A'} | TOV% ${homeNBA?.tovPct!=null?((homeNBA.tovPct*100).toFixed(1)+'%'):'N/A'}
+
+ATS TENDENCY (season):
+• ${away.name}: ${formatATSRecord(away.ats)}
+• ${home.name}: ${formatATSRecord(home.ats)}
+
+PACE / STYLE (last 15 games avg):
+• ${away.name}: ${away.avgPts??'—'} pts scored / ${away.avgOppPts??'—'} pts allowed per game (total ${away.avgPts&&away.avgOppPts?away.avgPts+away.avgOppPts:'—'})
+• ${home.name}: ${home.avgPts??'—'} pts scored / ${home.avgOppPts??'—'} pts allowed per game (total ${home.avgPts&&home.avgOppPts?home.avgPts+home.avgOppPts:'—'})
+• O/U line: ${odds?.overUnder??'N/A'} | Combined avg total: ${(away.avgPts&&away.avgOppPts&&home.avgPts&&home.avgOppPts)?Math.round(((away.avgPts+away.avgOppPts)/2+(home.avgPts+home.avgOppPts)/2)/2*10)/10:'N/A'}
+
+SCHEDULE & FATIGUE:
+• ${away.name}: ${formatRestSituation(away)} ${formatRoadTripNote(away)}
+• ${home.name}: ${formatRestSituation(home)}
+
+INJURIES & AVAILABILITY:
+• ${away.name}: ${formatInjuryList(g.awayInjuries)}
+• ${home.name}: ${formatInjuryList(g.homeInjuries)}
+
+CONFIRMED STARTERS:
+• ${away.name}: ${g.lineup?.confirmed && g.lineup.away.starters.length ? g.lineup.away.starters.map(p=>`${p.name}(${p.pos})`).join(', ') : 'Not yet confirmed'}
+• ${home.name}: ${g.lineup?.confirmed && g.lineup.home.starters.length ? g.lineup.home.starters.map(p=>`${p.name}(${p.pos})`).join(', ') : 'Not yet confirmed'}
+
+RECENT FORM (last 10 with margins):
+• ${away.name}: ${formatRecentForm(away)}
+• ${home.name}: ${formatRecentForm(home)}
+
+STANDINGS & PLAYOFF CONTEXT:
+• ${away.name}: ${formatStandingsLine(aSt)} | ${formatPlayoffContext(aSt)}
+• ${home.name}: ${formatStandingsLine(hSt)} | ${formatPlayoffContext(hSt)}
+
+HEAD-TO-HEAD THIS SEASON (${home.name} perspective):
+• ${fh2h}
+${fh2hlast?`• ${fh2hlast}`:''}
+
+REFEREE ASSIGNMENT:
+${g.refs?.length?g.refs.map(r=>`• ${r}${REF_NOTES[r]?' — '+REF_NOTES[r]:''}`).join('\n'):'• Not yet announced'}
+
+BETTING LINE: ${oddsLine}
+LINE MOVEMENT: ${flineMove}
+MULTI-BOOK CONSENSUS: ${g.multiOdds ? `${g.multiOdds.bookCount} books · consensus spread: ${g.home.abbr} ${fs(g.multiOdds.consensusSpread)} · consensus total: ${g.multiOdds.consensusTotal??'N/A'}${g.multiOdds.sharpAction?' · ⚡ SHARP ACTION: books split by '+g.multiOdds.lineDisparity+'pts':''}` : 'Not available'}
+PUBLIC BETTING (Action Network): ${g.publicBetting ? `Spread tickets: ${g.away.abbr} ${g.publicBetting.away.spreadBetPct??'?'}% / ${g.home.abbr} ${g.publicBetting.home.spreadBetPct??'?'}% | Money: ${g.away.abbr} ${g.publicBetting.away.spreadMoneyPct??'?'}% / ${g.home.abbr} ${g.publicBetting.home.spreadMoneyPct??'?'}%` : 'Not available'}
+
+RECENT NEWS:
+${newsStr}
+
+${scoutNote?`OVERRIDE SCOUT NOTE (analyst added — weight very heavily):\n${scoutNote}\n\n`:''}${calibration?calibration+'\n\n':''}Think like a quant, scout, locker room insider, and Vegas line mover. Consider: playoff motivation (teams fighting for seeding vs locked in vs eliminated play very differently), H2H dominance patterns, back-to-back fatigue, injury impact, home/road splits, schedule traps, load management, revenge games, road trip fatigue, line value vs true team quality, sharp line movement vs public steam.
+
+PICK OPTIONS: ${picks}
+
+Return ONLY valid JSON, no other text:
+{"pick":"${away.abbr} SPREAD or ${home.abbr} SPREAD or PASS","confidence":"Lean|Play|Strong Play|Best Bet","factors":["specific factor 1","specific factor 2","specific factor 3"],"risk":"biggest single risk to this pick","sharpSummary":"one sharp sentence on why the public has this wrong","skipPick":false}`;
+}
+
+async function callClaude(game){
+  // Use /api/game-analysis — server caches by gameId+oddsKey so all users share
+  // one Claude call per game per line. 1000 users = 1 Claude call, not 1000.
+  const oddsKey = String(game.odds?.homeSpread ?? 'no-odds');
+  const r=await fetch('/api/game-analysis',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ gameId: game.id, oddsKey, prompt: buildPrompt(game) })
+  });
+  if(r.status===404) throw new Error('Run Launch CourtIQ.bat to enable AI analysis');
+  if(!r.ok){const e=await r.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${r.status}`);}
+  return r.json();
+}
+
+// ─── ANALYZE ─────────────────────────────────────────────────────────────────
+async function analyzeGame(gid){
+  const game=S.games.find(g=>g.id===gid); if(!game)return;
+  S.analyzing.add(gid);
+  updateAIStatus();
+  const el=document.getElementById(`ai-${gid}`);
+  if(el) el.innerHTML=`<div class="ai-load"><div class="spin-sm"></div><div class="ai-ltxt">Analyzing with Claude...</div></div>`;
+  try {
+    const res=await callClaude(game);
+    S.analyses[gid]=res;
+    savePick(game, res);
+    if(el) el.innerHTML=renderAIResult(res);
+  } catch(e) {
+    if(el) el.innerHTML=`<div class="ai-err">⚠ ${e.message} <button class="btn-addkey" style="margin-left:8px" onclick="analyzeGame('${gid}')">Retry</button></div>`;
+  } finally {
+    S.analyzing.delete(gid);
+    updateAIStatus();
+    updatePicksTab();
+  }
+}
+
+async function startAnalysis(){
+  updateAIStatus();
+  // Rate-limit: process MAX_CONCURRENT_ANALYSIS games at a time
+  // Prevents API rate limit errors and runaway costs on big slates
+  const gameIds=[...S.games.map(g=>g.id)];
+  async function runBatch(){
+    const batch=gameIds.splice(0,MAX_CONCURRENT_ANALYSIS);
+    if(!batch.length) return;
+    await Promise.allSettled(batch.map(id=>analyzeGame(id)));
+    updatePicksTab();
+    if(gameIds.length) await runBatch();
+  }
+  await runBatch();
+  updatePicksTab();
+}
+
+function updateAIStatus(){
+  const el=document.getElementById('ai-status');
+  if(!el)return;
+  const n=S.analyzing.size;
+  if(n>0){
+    el.innerHTML=`<div class="spin-sm"></div><span>Analyzing ${n} game${n>1?'s':''}...</span>`;
+  } else {
+    const done=Object.keys(S.analyses).length;
+    if(done>0) el.innerHTML=`<span style="color:var(--green)">✓ ${done} game${done>1?'s':''} analyzed</span>`;
+    else el.innerHTML='';
+  }
+}
+
+// ─── RENDER HELPERS ───────────────────────────────────────────────────────────
+function confBadge(c){
+  const m={'Best Bet':['cb-best','🏆 BEST BET'],'Strong Play':['cb-strong','🔵 STRONG PLAY'],'Play':['cb-play','🟢 PLAY'],'Lean':['cb-lean','⚪ LEAN']};
+  const[cls,lbl]=m[c]||['cb-lean',c];
+  return `<span class="cbadge ${cls}">${lbl}</span>`;
+}
+function renderAIResult(r){
+  if(!r||r.skipPick||r.pick==='PASS') return `<div class="ai-idle"><span class="ai-itxt">No strong edge detected by AI — line looks sharp.</span></div>`;
+  const col=r.confidence==='Best Bet'?'var(--gold)':r.confidence==='Strong Play'?'var(--accent)':r.confidence==='Play'?'var(--green)':'var(--muted)';
+  return `<div class="ai-res">
+    <div class="ai-pr">${confBadge(r.confidence)}<span class="ai-ptxt" style="color:${col}">${r.pick}</span></div>
+    <div class="ai-sharp">"${r.sharpSummary}"</div>
+    <div class="ai-facts">${(r.factors||[]).map(f=>`<div class="ai-fact">📌 ${f}</div>`).join('')}</div>
+    <div class="ai-risk">⚠️ Risk: ${r.risk}</div>
+  </div>`;
+}
+
+function injChips(injs=[]){
+  if(!injs.length) return `<span class="c-none">No injuries</span>`;
+  return injs.slice(0,4).map(i=>{
+    const s=(i.status||'').toLowerCase();
+    const cls=s.includes('out')||s.includes('inactive')?'c-out':s.includes('questionable')?'c-q':'c-p';
+    return `<span class="chip ${cls}">${i.player} – ${i.status}</span>`;
+  }).join('');
+}
+
+function restTag(t){
+  if(t.isB2B||t.restDays===0) return `<span class="rtag rb2b tip" data-tip="Back-to-Back: played yesterday. Historically costs 3–4 points of performance.">Back-to-Back</span>`;
+  if(t.restDays===1)           return `<span class="rtag r1d tip" data-tip="Only 1 day of rest since last game.">1 Day Rest</span>`;
+  if(t.restDays>=2)            return `<span class="rtag rok tip" data-tip="${t.restDays} days since last game. Well rested.">${t.restDays}d Rest</span>`;
+  return '';
+}
+
+function atsChip(ats){
+  if(!ats||ats.total<5)return '';
+  const rate=ats.covers/ats.total;
+  const cls=rate>=0.56?'c-p':rate<=0.44?'c-out':'c-q';
+  return `<span class="chip ${cls} tip" data-tip="Against The Spread record this season. ${fpct(rate)} cover rate. 52.4%+ is profitable at -110 odds.">ATS ${ats.covers}-${ats.total-ats.covers}</span>`;
+}
+
+function motivFlagsHTML(home,away){
+  const all=[...detectFlags(away,home.abbr),...detectFlags(home,away.abbr)];
+  if(!all.length)return '';
+  return `<div class="motiv-row">${all.map(f=>`<span class="mflag ${f.cls}">${f.label}</span>`).join('')}</div>`;
+}
+
+function renderNBAStatsRow(team) {
+  const ns = getNBAStats(team);
+  if (!ns) return '';
+  const netCls = ns.netRating >= 8 ? 'nba-elite' : ns.netRating >= 3 ? 'nba-good' : ns.netRating >= -2 ? 'nba-avg' : ns.netRating >= -6 ? 'nba-below' : 'nba-poor';
+  const offCls = ns.offRating >= 118 ? 'nba-elite' : ns.offRating >= 115 ? 'nba-good' : ns.offRating >= 111 ? 'nba-avg' : ns.offRating >= 108 ? 'nba-below' : 'nba-poor';
+  const defCls = ns.defRating <= 108 ? 'nba-elite' : ns.defRating <= 111 ? 'nba-good' : ns.defRating <= 115 ? 'nba-avg' : ns.defRating <= 118 ? 'nba-below' : 'nba-poor';
+  const efgCls = ns.efg >= 0.56 ? 'nba-elite' : ns.efg >= 0.54 ? 'nba-good' : ns.efg >= 0.51 ? 'nba-avg' : ns.efg >= 0.49 ? 'nba-below' : 'nba-poor';
+  const netStr = ns.netRating >= 0 ? `+${ns.netRating}` : `${ns.netRating}`;
+  return `<div class="nba-stats-row">
+    <div class="nba-stat tip" data-tip="Points scored per 100 possessions. League avg ≈ 113. Higher = better offense."><span class="nba-stat-val ${offCls}">${ns.offRating}</span><span class="nba-stat-lbl">OFF RTG</span></div>
+    <span class="nba-div">·</span>
+    <div class="nba-stat tip" data-tip="Points allowed per 100 possessions. League avg ≈ 113. Lower = better defense."><span class="nba-stat-val ${defCls}">${ns.defRating}</span><span class="nba-stat-lbl">DEF RTG</span></div>
+    <span class="nba-div">·</span>
+    <div class="nba-stat tip" data-tip="Net Rating = OFF minus DEF. Truest measure of team quality. Avg = 0. Above +5 is very good."><span class="nba-stat-val ${netCls}">${netStr}</span><span class="nba-stat-lbl">NET</span></div>
+    <span class="nba-div">·</span>
+    <div class="nba-stat tip" data-tip="Possessions per 48 mins. League avg ≈ 98. Higher = faster game, more scoring. Key for Over/Under."><span class="nba-stat-val nba-avg">${ns.pace}</span><span class="nba-stat-lbl">PACE</span></div>
+    <span class="nba-div">·</span>
+    <div class="nba-stat tip" data-tip="Effective FG%. Weights 3-pointers higher since they're worth more. League avg ≈ 53%."><span class="nba-stat-val ${efgCls}">${(ns.efg*100).toFixed(1)}%</span><span class="nba-stat-lbl">eFG%</span></div>
+  </div>`;
+}
+
+function renderMultiBookOdds(game) {
+  const mb = game.multiOdds;
+  if (!mb || !mb.spreads?.length) return '';
+
+  // Show up to 5 books for the spread
+  const topBooks = mb.spreads.slice(0, 5);
+  const bestSpreadLine = mb.spreads.reduce((best, b) =>
+    Math.abs(b.homeSpread) < Math.abs(best.homeSpread) ? b : best
+  );
+
+  const bookChips = topBooks.map(b => {
+    const isBest = b.homeSpread === bestSpreadLine.homeSpread;
+    const label = BOOK_LABELS[b.book] || b.title;
+    return `<div class="mb-book${isBest?' mb-best':''} tip" data-tip="${label}: ${game.home.abbr} ${fs(b.homeSpread)}">
+      <span class="mb-book-name">${label}</span>
+      <span class="mb-book-line">${fs(b.homeSpread)}</span>
+    </div>`;
+  }).join('');
+
+  const sharpHTML = mb.sharpAction
+    ? `<div class="mb-sharp tip" data-tip="Books disagree by ${mb.lineDisparity} points — sign of sharp money moving the line.">⚡ ${mb.lineDisparity}pt line split — sharp action</div>`
+    : '';
+
+  const bestMLHTML = mb.bestAwayML && mb.bestHomeML
+    ? `<div class="mb-book tip" data-tip="Best moneyline available across all books.">
+        <span class="mb-book-name">Best ML</span>
+        <span class="mb-book-line" style="font-size:10px">${game.away.abbr} ${fml(mb.bestAwayML.ml)} @ ${mb.bestAwayML.title.replace('DraftKings','DK').replace('FanDuel','FD').replace('BetMGM','MGM')}</span>
+      </div>`
+    : '';
+
+  return `<div class="mb-row">
+    <span class="mb-label">📚 ${mb.bookCount} books · consensus: <span class="mb-consensus">${game.home.abbr} ${fs(mb.consensusSpread)}</span>${mb.consensusTotal ? ` · O/U <span class="mb-consensus">${mb.consensusTotal}</span>` : ''}</span>
+    ${bookChips}
+    ${bestMLHTML}
+    ${sharpHTML}
+  </div>`;
+}
+
+function renderPublicBetting(game) {
+  const pb = game.publicBetting;
+  if (!pb) return '';
+
+  const awaySpread = pb.away.spreadBetPct;
+  const homeSpread = pb.home.spreadBetPct;
+  const awayMoney  = pb.away.spreadMoneyPct;
+  const homeMoney  = pb.home.spreadMoneyPct;
+
+  if (awaySpread == null && awayMoney == null) return '';
+
+  // Sharp money detector:
+  // If % of money differs significantly from % of bets on the same side,
+  // big money (sharp) is on the other side
+  let sharpHTML = '';
+  if (awayMoney != null && awaySpread != null) {
+    const awayMoneyVsBets = awayMoney - awaySpread;
+    const homeMoneyVsBets = (homeMoney || (100 - awayMoney)) - (homeSpread || (100 - awaySpread));
+    if (Math.abs(awayMoneyVsBets) >= 10) {
+      const sharpSide = awayMoneyVsBets > 0 ? game.away.abbr : game.home.abbr;
+      const publicSide = awayMoneyVsBets > 0 ? game.home.abbr : game.away.abbr;
+      const diff = Math.abs(awayMoneyVsBets);
+      sharpHTML = `<div class="pb-sharp tip" data-tip="Sharp money indicator: % of money and % of bets diverge by ${diff}pts. Big money favoring ${sharpSide} while public bets ${publicSide}.">⚡ Sharp $$ on ${sharpSide} — money % diverges ${diff}pts from ticket %</div>`;
+    }
+  }
+
+  // Heavy public side indicator (fade the public signal)
+  let publicHTML = '';
+  if (awaySpread != null) {
+    const heavySide = awaySpread >= 65 ? game.away.abbr : homeSpread >= 65 ? game.home.abbr : null;
+    const pct = awaySpread >= 65 ? awaySpread : homeSpread;
+    if (heavySide) {
+      publicHTML = `<div class="pb-public tip" data-tip="${pct}% of bets on ${heavySide}. Heavy public side — sharp bettors often fade when one team has 65%+ of tickets.">🐑 ${pct}% public on ${heavySide} — potential fade spot</div>`;
+    }
+  }
+
+  const buildBar = (awayPct, homePct, awayAbbr, homeAbbr) => {
+    if (awayPct == null) return '';
+    const hp = homePct ?? 100 - awayPct;
+    return `<div class="pb-bar-wrap">
+      <span class="pb-team-away">${awayAbbr}</span>
+      <span class="pb-label-away">${awayPct}%</span>
+      <div class="pb-bar">
+        <div class="pb-fill-away" style="width:${awayPct}%"></div>
+      </div>
+      <span class="pb-label-home">${hp}%</span>
+      <span class="pb-team-home">${homeAbbr}</span>
+    </div>`;
+  };
+
+  return `<div class="pb-row">
+    <div class="pb-title">📊 Public Betting <span class="pb-title-badge">Action Network</span></div>
+    ${awaySpread != null ? `<div class="pb-market">
+      <div class="pb-market-label">Spread Tickets</div>
+      ${buildBar(awaySpread, homeSpread, game.away.abbr, game.home.abbr)}
+    </div>` : ''}
+    ${awayMoney != null ? `<div class="pb-market">
+      <div class="pb-market-label">Spread Money</div>
+      ${buildBar(awayMoney, homeMoney, game.away.abbr, game.home.abbr)}
+    </div>` : ''}
+    ${sharpHTML}
+    ${publicHTML}
+  </div>`;
+}
+
+function renderLineupSection(game) {
+  const lu = game.lineup;
+  const homeInj = game.homeInjuries || [];
+  const awayInj = game.awayInjuries || [];
+
+  // Separate injuries by severity
+  const outFilter   = injs => injs.filter(i => (i.status||'').toLowerCase().includes('out') || (i.status||'').toLowerCase().includes('inactive'));
+  const doubtFilter = injs => injs.filter(i => (i.status||'').toLowerCase().includes('doubtful'));
+  const questFilter = injs => injs.filter(i => (i.status||'').toLowerCase().includes('questionable'));
+
+  const homeOut   = outFilter(homeInj);
+  const awayOut   = outFilter(awayInj);
+  const homeDoubt = doubtFilter(homeInj);
+  const awayDoubt = doubtFilter(awayInj);
+  const homeQuest = questFilter(homeInj);
+  const awayQuest = questFilter(awayInj);
+
+  const hasAnyInjury = homeOut.length || awayOut.length || homeDoubt.length || awayDoubt.length || homeQuest.length || awayQuest.length;
+  const hasLineup = lu?.confirmed && (lu.home.starters.length > 0 || lu.away.starters.length > 0);
+
+  if (!hasAnyInjury && !hasLineup) return '';
+
+  // Build OUT/Doubtful chips for a team
+  const buildAvailability = (out, doubt, quest) => {
+    let html = '';
+    if (out.length || doubt.length || quest.length) {
+      html += `<div class="lu-out-section">`;
+      if (out.length) {
+        html += `<div class="lu-out-title" style="color:var(--red)">❌ Out</div><div class="lu-out-players">`;
+        html += out.map(p => `<span class="lu-out" title="${p.type||'Injury'}">✗ ${p.player}</span>`).join('');
+        html += '</div>';
+      }
+      if (doubt.length) {
+        html += `<div class="lu-out-title" style="color:var(--orange);margin-top:4px">⚠️ Doubtful</div><div class="lu-out-players">`;
+        html += doubt.map(p => `<span class="lu-doubt">${p.player}</span>`).join('');
+        html += '</div>';
+      }
+      if (quest.length) {
+        html += `<div class="lu-out-title" style="color:var(--muted);margin-top:4px">❓ Questionable</div><div class="lu-out-players">`;
+        html += quest.map(p => `<span class="lu-prob">${p.player}</span>`).join('');
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  };
+
+  // Build confirmed starters list
+  const buildStarters = (starters) => {
+    if (!starters?.length) return '<span style="font-size:11px;color:var(--dim)">TBD</span>';
+    return `<div class="lu-starters">` + starters.map(p =>
+      `<div class="lu-player"><span class="lu-pos">${p.pos}</span><span class="lu-name">${p.name}</span></div>`
+    ).join('') + '</div>';
+  };
+
+  const confirmedLabel = hasLineup
+    ? `<span class="lu-confirmed">✓ Confirmed</span>`
+    : `<span class="lu-tbd">Lineups TBD</span>`;
+
+  return `<div class="lu-row">
+    <div class="lu-title"><span>📋 Lineups & Availability</span>${confirmedLabel}</div>
+    ${hasLineup ? `<div class="lu-teams">
+      <div>
+        <div class="lu-team-label">${game.away.abbr} Starters</div>
+        ${buildStarters(lu.away.starters)}
+      </div>
+      <div>
+        <div class="lu-team-label">${game.home.abbr} Starters</div>
+        ${buildStarters(lu.home.starters)}
+      </div>
+    </div>` : ''}
+    ${hasAnyInjury ? `<div class="lu-teams" style="margin-top:${hasLineup?'8px':'0'}">
+      <div>
+        <div class="lu-team-label">${game.away.abbr}</div>
+        ${buildAvailability(awayOut, awayDoubt, awayQuest)}
+        ${!awayOut.length && !awayDoubt.length && !awayQuest.length ? '<span style="font-size:11px;color:var(--dim)">No injuries reported</span>' : ''}
+      </div>
+      <div>
+        <div class="lu-team-label">${game.home.abbr}</div>
+        ${buildAvailability(homeOut, homeDoubt, homeQuest)}
+        ${!homeOut.length && !homeDoubt.length && !homeQuest.length ? '<span style="font-size:11px;color:var(--dim)">No injuries reported</span>' : ''}
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+// ─── RENDER GAME CARD ─────────────────────────────────────────────────────────
+function renderCard(game){
+  const{id,home,away,odds,time,venue,broadcast}=game;
+  const anal=S.analyses[id];
+  const note=S.notes[id]||'';
+  const hasNote=note.trim().length>0;
+  const scoutHTML=`<div class="scout-row">
+    <div class="scout-toggle" onclick="toggleScout('${id}')">🔒 <span>Analyst Override</span>${hasNote?`<span style="color:var(--accent);font-size:9px;margin-left:5px">● active</span>`:''}<span style="margin-left:auto;font-size:9px;opacity:.5">${hasNote?'▾':'▸'}</span></div>
+    <div class="scout-input-wrap${hasNote?' open':''}" id="scout-wrap-${id}">
+      <textarea class="scout-ta" rows="2" placeholder="Override note — Claude will weight this heavily above all other signals..." oninput="saveNote('${id}',this.value)">${note}</textarea>
+      <div class="scout-saved" id="scout-saved-${id}"></div>
+    </div>
+  </div>`;
+
+  // Seed badges
+  const hSt=S.standings[home.id], aSt=S.standings[away.id];
+  const seedBadge=st=>{
+    if(!st)return '';
+    const cls=st.clinch==='ELIM'?'seed-x':st.clinch?'seed-e':st.rank<=10?'seed-pi':'';
+    return `<span class="seed-badge ${cls}">#${st.rank} ${st.conf}</span>`;
+  };
+  // Line movement
+  const opening=S.openingOdds[id];
+  const lmDiff=opening&&odds?parseFloat((odds.homeSpread-(opening.homeSpread||0)).toFixed(1)):0;
+  const lmHTML=opening&&odds&&Math.abs(lmDiff)>=LINE_MOVE_DISPLAY_DELTA
+    ?`<div class="lm-row"><span class="${lmDiff<0?'lm-up':'lm-dn'}">${lmDiff<0?'▲':'▼'} Line moved ${Math.abs(lmDiff)}</span><span style="color:var(--dim)">· opened ${home.abbr} ${fs(opening.homeSpread)}</span></div>`
+    :'';
+  // H2H chip
+  const h2hChip=game.h2h?`<span class="h2h-chip">H2H: ${game.h2h.wins}-${game.h2h.losses}</span>`:'';
+
+  // Pace chip for O/U context
+  const hPace=home.avgPts&&home.avgOppPts?home.avgPts+home.avgOppPts:null;
+  const aPace=away.avgPts&&away.avgOppPts?away.avgPts+away.avgOppPts:null;
+  const combinedPace=hPace&&aPace?Math.round((hPace/2+aPace/2)*10)/10:null;
+  const paceTag=combinedPace&&odds?.overUnder?
+    (combinedPace>odds.overUnder+PACE_EDGE_THRESHOLD?`<span class="chip c-p" title="Avg combined total: ${combinedPace}">⚡ Pace OVER</span>`:
+     combinedPace<odds.overUnder-PACE_EDGE_THRESHOLD?`<span class="chip c-out" title="Avg combined total: ${combinedPace}">🐢 Pace UNDER</span>`:
+     `<span class="chip c-q" title="Avg combined total: ${combinedPace}">〰 Neutral Pace</span>`):'';
+
+  const oddsHTML=odds?`<div class="odds-row">
+    <div class="oc"><div class="ol tip" data-tip="Points the favorite must win by. Negative = favored. Bet the favorite to win by more, or the underdog to lose by less.">Spread</div><div class="ov">${home.abbr} ${fs(odds.homeSpread)}</div>${lmHTML}</div>
+    <div class="oc"><div class="ol tip" data-tip="Total combined score. Bet Over if you think both teams will score a lot, Under if you think it'll be a low-scoring game.">Over / Under</div><div class="ov">${odds.overUnder??'—'}</div><div class="os">${fml(odds.overOdds)} / ${fml(odds.underOdds)}${paceTag?` ${paceTag}`:''}</div></div>
+    <div class="oc"><div class="ol tip" data-tip="Bet on who wins outright with no spread. -150 means bet $150 to win $100. +130 means bet $100 to win $130.">Moneyline</div><div class="ov">${away.abbr} ${fml(odds.awayML)}</div><div class="os">${home.abbr} ${fml(odds.homeML)}</div></div>
+  </div>`:`<div class="no-odds">Odds not yet posted</div>`;
+
+  let aiHTML;
+  if(anal){
+    aiHTML=renderAIResult(anal);
+  } else {
+    aiHTML=`<div class="ai-load"><div class="spin-sm"></div><div class="ai-ltxt">${S.analyzing.has(id)?'Analyzing with Claude...':'Queued for analysis...'}</div></div>`;
+  }
+
+  const sp=statPick(game);
+  const tierTips={'S':'Statistical model detects 6+ point edge vs the line. Strongest signal.','A':'4–6 point edge detected by the power model.','B':'2.5–4 point edge. Worth noting alongside AI analysis.'};
+  const spRow=sp
+    ?`<div class="sp-row"><span class="spt t${sp.tier} tip" data-tip="${tierTips[sp.tier]||'Statistical edge detected.'}">${sp.tier} STAT</span><span class="sptxt">BET: ${sp.pickTeam.abbr} ${fs(sp.pickSpread)}</span><span class="spedge tip" data-tip="Edge in points vs the posted spread based on power ratings.">+${sp.edge} pts</span></div>`
+    :`<div class="sp-row"><span class="spt tP">⚪ PASS</span><span class="spedge" style="flex:1;font-size:11px;color:var(--dim)">No statistical edge detected</span></div>`;
+
+  const refLabel=game.refs?.length?game.refs[0]:'';
+  const refNote=refLabel&&REF_NOTES[refLabel]?REF_NOTES[refLabel]:'';
+  const refChip=refLabel?`<span class="gc-ref" title="${refNote||'Referee'}">🧑‍⚖️ ${refLabel}${refNote?` · ${refNote}`:''}</span>`:'';
+
+  return `<div class="gc" id="card-${id}">
+    <div class="gc-hdr"><span class="gc-time">${time}</span><span class="gc-venue">${venue}</span><span class="gc-net">${broadcast}</span></div>
+    ${refChip?`<div class="gc-ref-row">${refChip}</div>`:''}
+    <div class="mu">
+      <div class="ts aw">
+        <div class="lrel"><img class="tlogo" src="${away.logo}" alt="" onerror="this.style.opacity=0">${away.isB2B?'<span class="b2b-p">B2B</span>':''}</div>
+        <span class="slbl">Away</span>
+        <span class="tnm">${away.name}${seedBadge(aSt)}</span>
+        <span class="trec">${away.overall.w}-${away.overall.l}</span>
+        <span class="tsit">Road: ${away.roadRecord.w}-${away.roadRecord.l}</span>
+        <span class="tpwr tip" data-tip="Power rating (0–100). Blends win%, home/road record & NBA net rating. 50 = league average. Higher is stronger tonight.">PWR ${away.power}</span>
+        ${restTag(away)}${atsChip(away.ats)}
+      </div>
+      <div class="vs">VS</div>
+      <div class="ts hm">
+        <div class="lrel"><img class="tlogo" src="${home.logo}" alt="" onerror="this.style.opacity=0">${home.isB2B?'<span class="b2b-p">B2B</span>':''}</div>
+        <span class="slbl">Home</span>
+        <span class="tnm">${home.name}${seedBadge(hSt)}</span>
+        <span class="trec">${home.overall.w}-${home.overall.l}</span>
+        <span class="tsit">Home: ${home.homeRecord.w}-${home.homeRecord.l}</span>
+        <span class="tpwr tip" data-tip="Power rating (0–100). Blends win%, home/road record & NBA net rating. 50 = league average. Higher is stronger tonight.">PWR ${home.power}</span>
+        ${restTag(home)}${atsChip(home.ats)}
+      </div>
+    </div>
+    ${renderNBAStatsRow(away)}
+    ${renderNBAStatsRow(home)}
+    <div class="inj-row">
+      <span class="inj-icon">🏥</span>
+      ${injChips(game.awayInjuries)}
+      <span class="inj-div">|</span>
+      ${injChips(game.homeInjuries)}
+    </div>
+    ${oddsHTML}
+    ${motivFlagsHTML(home,away)}${h2hChip?`<div class="motiv-row">${h2hChip}</div>`:''}
+    ${renderMultiBookOdds(game)}
+    ${renderPublicBetting(game)}
+    ${renderLineupSection(game)}
+    <div class="ai-sec" id="ai-${id}">${aiHTML}</div>
+    ${scoutHTML}
+    ${spRow}
+  </div>`;
+}
+
+// ─── RENDER PICKS TAB ─────────────────────────────────────────────────────────
+function updatePicksTab(){
+  const co={'Best Bet':0,'Strong Play':1,'Play':2,'Lean':3};
+  const aiPicks=S.games
+    .filter(g=>S.analyses[g.id]&&!S.analyses[g.id].skipPick&&S.analyses[g.id].pick!=='PASS')
+    .map(g=>({game:g,a:S.analyses[g.id]}))
+    .sort((a,b)=>(co[a.a.confidence]??9)-(co[b.a.confidence]??9));
+
+  const statOnly=S.games
+    .filter(g=>!S.analyses[g.id]&&statPick(g))
+    .map(g=>({game:g,sp:statPick(g)}))
+    .sort((a,b)=>b.sp.edge-a.sp.edge);
+
+  const bbs=aiPicks.filter(p=>p.a.confidence==='Best Bet').length;
+  const sps=aiPicks.filter(p=>p.a.confidence==='Strong Play').length;
+  const pls=aiPicks.filter(p=>p.a.confidence==='Play').length;
+  const ln =aiPicks.filter(p=>p.a.confidence==='Lean').length;
+
+  document.getElementById('ptop').innerHTML=`
+    <div class="psbox"><div class="psval" style="color:var(--gold)">${bbs}</div><div class="pslbl">🏆 Best Bets</div></div>
+    <div class="psbox"><div class="psval">${sps}</div><div class="pslbl">🔵 Strong Plays</div></div>
+    <div class="psbox"><div class="psval" style="color:var(--green)">${pls}</div><div class="pslbl">🟢 Plays</div></div>
+    <div class="psbox"><div class="psval" style="color:var(--muted)">${ln}</div><div class="pslbl">⚪ Leans</div></div>`;
+
+  const listEl=document.getElementById('plist');
+
+  // Analyzing state
+  if(S.analyzing.size>0&&!aiPicks.length&&!statOnly.length){
+    listEl.innerHTML=`<div class="fpc"><div class="ai-loading-card"><div class="spin-sm"></div> Claude is analyzing all ${S.games.length} games...</div></div>`;
+    return;
+  }
+
+  if(!aiPicks.length&&!statOnly.length){
+    listEl.innerHTML=`<div class="empty"><span class="ei">🔍</span>No strong edges found today.</div>`;
+    return;
+  }
+
+  const aiCards=aiPicks.map(({game,a})=>{
+    const{home,away,odds,time,venue}=game;
+    const pickIsHome=a.pick.startsWith(home.abbr);
+    const pt=pickIsHome?home:away, ot=pickIsHome?away:home;
+    const bpc=a.confidence==='Best Bet'?'bp-best':a.confidence==='Strong Play'?'bp-strong':'bp-play';
+    const ecol=a.confidence==='Best Bet'?'var(--gold)':a.confidence==='Strong Play'?'var(--accent)':a.confidence==='Play'?'var(--green)':'var(--muted)';
+    return `<div class="fpc ${bpc}">
+      <div class="fpc-hdr"><div class="fpc-hl">${confBadge(a.confidence)}<span style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em">SPREAD</span></div><span class="fpc-time">${time}</span></div>
+      <div class="fpc-body">
+        <img class="fpc-logo" src="${pt.logo}" alt="" onerror="this.style.opacity=0">
+        <div class="fpc-main"><div class="fpc-team">${pt.name}</div><div class="fpc-spr">${a.pick}</div><div class="fpc-vs">vs ${ot.name} · ${venue}</div></div>
+      </div>
+      <div class="fpc-sharp">"${a.sharpSummary}"</div>
+      <div class="fpc-facts">${(a.factors||[]).map(f=>`<div class="fpc-fact">📌 ${f}</div>`).join('')}</div>
+      <div class="fpc-risk">⚠️ Risk: ${a.risk}</div>
+      <div class="fpc-foot"><span>Odds: ${fml(odds?.spreadOdds??-110)}</span><span>${pt.isB2B?'⚠️ B2B':''} ${ot.isB2B?'⚠️ Opp B2B':''}</span></div>
+    </div>`;
+  }).join('');
+
+  const statCards=statOnly.map(({game,sp})=>{
+    const{home,away,odds,time,venue}=game;
+    const opp=sp.pickHome?away:home;
+    return `<div class="fpc">
+      <div class="fpc-hdr"><div class="fpc-hl"><span class="spt t${sp.tier}">${sp.tier} STAT</span><span style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em">SPREAD · Statistical Model</span></div><span class="fpc-time">${time}</span></div>
+      <div class="fpc-body">
+        <img class="fpc-logo" src="${sp.pickTeam.logo}" alt="" onerror="this.style.opacity=0">
+        <div class="fpc-main"><div class="fpc-team">${sp.pickTeam.name}</div><div class="fpc-spr">${sp.pickTeam.abbr} ${fs(sp.pickSpread)}</div><div class="fpc-vs">vs ${opp.name} · ${venue}</div></div>
+        <div class="fpc-edge"><div class="fpc-enum" style="color:var(--accent)">+${sp.edge}</div><div class="fpc-elbl">pts edge</div></div>
+      </div>
+      <div class="fpc-sharp">"Power model sees ${sp.edge}pt edge. Add Claude API key for full AI analysis."</div>
+      <div class="fpc-foot"><span>Statistical only</span></div>
+    </div>`;
+  }).join('');
+
+  listEl.innerHTML=aiCards+statCards;
+}
+
+// ─── RENDER TEAMS TAB ─────────────────────────────────────────────────────────
+function renderTeamsTab(){
+  const teams=[]; const seen=new Set();
+  S.games.forEach(g=>[g.home,g.away].forEach(t=>{if(!seen.has(t.id)){seen.add(t.id);teams.push(t);}}));
+  teams.sort((a,b)=>b.power-a.power);
+  const mx=teams[0]?.power||100;
+  const rows=teams.map((t,i)=>{
+    const sr=t.isHome?t.homeRecord:t.roadRecord, sl=t.isHome?'Home':'Road';
+    return `<div class="rr">
+      <span class="rnum">${i+1}</span>
+      <div class="rteam"><img class="rlogo" src="${t.logo}" alt="" onerror="this.style.display='none'">
+        <div><div class="rnm">${t.name}${t.isB2B?` <span style="font-size:9px;background:rgba(255,68,68,.12);color:var(--red);padding:1px 5px;border-radius:4px">B2B</span>`:''}</div><div class="rab">${t.abbr}</div></div>
+      </div>
+      <div class="rpwrc"><div class="rpnum">${t.power}</div><div class="rpbar"><div class="rpfill" style="width:${Math.round(t.power/mx*100)}%"></div></div></div>
+      <span class="rrec">${t.overall.w}-${t.overall.l}</span>
+      <span class="rsit csit">${sl}: ${sr.w}-${sr.l}</span>
+      <span class="rstatus cstat">Tonight</span>
+    </div>`;
+  }).join('');
+  document.getElementById('tc').innerHTML=`
+    <div class="rk-hdr"><h2>Power Rankings — Tonight's Teams</h2><span>55% overall + 45% situational win%</span></div>
+    <div class="rkt">
+      <div class="rr rh"><span>#</span><span>Team</span><span>PWR</span><span>Record</span><span class="csit">Situation</span><span class="cstat">Status</span></div>
+      ${rows}
+    </div>
+    <div class="disclaimer">Power rating = 55% overall win% + 45% home/road situational win%. B2B penalty −${B2B_PEN} pwr (≈${(B2B_PEN*SCALE).toFixed(1)} pts). Home court +${HOME_COURT} pwr (≈${(HOME_COURT*SCALE).toFixed(1)} pts).</div>`;
+}
+
+// ─── RENDER TRACK RECORD TAB ─────────────────────────────────────────────────
+function renderTrackRecord(){
+  const el=document.getElementById('tr-content'); if(!el) return;
+  const history=loadHistory();
+  if(!history.length){
+    el.innerHTML=`<div class="tr-empty">No picks recorded yet.<br><span style="font-size:12px;color:var(--dim)">Picks are saved automatically when Claude finishes analyzing each game — non-PASS results only.</span></div>`;
+    return;
+  }
+  const rec=computeRecord(history);
+  const netCol=rec.net>=0?'var(--green)':'var(--red)';
+  const wpCol=rec.winPct===null?'var(--muted)':rec.winPct>=55?'var(--green)':rec.winPct>=48?'var(--gold)':'var(--red)';
+
+  const summaryHTML=`<div class="tr-summary">
+    <div class="tr-box"><div class="tr-val">${rec.w}-${rec.l}${rec.p?'-'+rec.p:''}</div><div class="tr-lbl">Record (W-L-P)</div></div>
+    <div class="tr-box tip" data-tip="% of picks that covered the spread. Need 52.4%+ to be profitable at standard -110 odds."><div class="tr-val" style="color:${wpCol}">${rec.winPct!==null?rec.winPct+'%':'—'}</div><div class="tr-lbl">ATS Win %</div></div>
+    <div class="tr-box tip" data-tip="Total profit/loss in betting units. Assumes -110 odds (bet $110 to win $100) on every pick."><div class="tr-val" style="color:${netCol}">${rec.net>=0?'+':''}${rec.net}u</div><div class="tr-lbl">Net Units (-110)</div></div>
+    <div class="tr-box"><div class="tr-val">${rec.graded}</div><div class="tr-lbl">Graded</div></div>
+    ${rec.pending?`<div class="tr-box"><div class="tr-val" style="color:var(--dim)">${rec.pending}</div><div class="tr-lbl">Pending</div></div>`:''}
+  </div>`;
+
+  const tierMap={'Best Bet':['cb-best','🏆 BEST BET'],'Strong Play':['cb-strong','🔵 STRONG'],'Play':['cb-play','🟢 PLAY'],'Lean':['cb-lean','⚪ LEAN']};
+  const tierRows=['Best Bet','Strong Play','Play','Lean'].map(t=>{
+    const b=rec.byTier[t]; if(!b.total) return '';
+    const[cls,lbl]=tierMap[t];
+    const n=Math.round(((b.w*(100/110))-b.l)*100)/100;
+    const nc=n>=0?'var(--green)':'var(--red)';
+    return `<div class="tr-tier-row">
+      <span class="cbadge ${cls}">${lbl}</span><span></span>
+      <span>${b.w}-${b.l}${b.p?'-'+b.p:''}</span>
+      <span>${b.winPct!==null?b.winPct+'%':'—'}</span>
+      <span style="color:${nc}">${n>=0?'+':''}${n}u</span>
+    </div>`;
+  }).join('');
+
+  const tiersHTML=tierRows?`<div class="tr-tiers">
+    <div class="tr-tier-row tr-hdr"><span>Tier</span><span></span><span>W-L-P</span><span>Win%</span><span>Net</span></div>
+    ${tierRows}
+  </div>`:'' ;
+
+  const recent=history.slice(0,RECENT_PICKS_DISPLAY);
+  const confCls=c=>c==='Best Bet'?'cb-best':c==='Strong Play'?'cb-strong':c==='Play'?'cb-play':'cb-lean';
+  const itemsHTML=recent.map(h=>{
+    const resCls=h.result==='W'?'tr-w':h.result==='L'?'tr-l':h.result==='P'?'tr-push':'tr-pend';
+    const resLbl=h.result==='W'?'✓ WIN':h.result==='L'?'✗ LOSS':h.result==='P'?'PUSH':'Pending';
+    const dateDisp=`${h.date.slice(4,6)}/${h.date.slice(6,8)}`;
+    return `<div class="tr-item">
+      <span class="tr-item-date">${dateDisp}</span>
+      <span class="tr-item-mu">${h.matchup}</span>
+      <span class="tr-item-pick">${h.pick} <span class="cbadge ${confCls(h.confidence)}" style="font-size:9px">${h.confidence}</span></span>
+      <span class="tr-result ${resCls}">${resLbl}</span>
+      <span class="tr-score">${h.finalScore||''}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div><h2 style="font-size:18px;font-weight:800">CourtIQ Track Record</h2>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">Picks graded automatically the morning after each game</div></div>
+      <button class="tr-clear" onclick="clearHistory()">🗑 Clear</button>
+    </div>
+    ${summaryHTML}
+    ${tiersHTML}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Recent Picks</span>
+      <span style="font-size:11px;color:var(--dim)">Last ${recent.length} of ${history.length}</span>
+    </div>
+    <div class="tr-hist">${itemsHTML}</div>
+    <div class="disclaimer" style="margin-top:8px">Win = +${(100/110*100).toFixed(1)} units / Loss = −100 units at standard −110 vig. Picks auto-save when Claude returns a non-PASS result. Past performance ≠ future results.</div>`;
+}
+
+// ─── PLAY OF THE DAY ──────────────────────────────────────────────────────────
+let potdGenerated = false; // only call Claude once per session
+
+async function renderPOTD() {
+  const el = document.getElementById('potd-content');
+  if (!el) return;
+
+  const disclaimerHTML = `<div class="potd-disclaimer">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <span><strong>Disclaimer:</strong> this is a lock — a certified, stone-cold, can't-miss, sleep-easy-tonight lock.
+    <strong>*just hope Noah doesn't bet on it, or it's cookies.</strong></span>
+  </div>`;
+
+  // If already rendered this session, don't re-fetch
+  if (potdGenerated) return;
+  potdGenerated = true;
+
+  if (!S.games.length) {
+    el.innerHTML = `<div class="potd-wrap">${disclaimerHTML}<div class="potd-err"><span style="font-size:36px;display:block;margin-bottom:12px">📭</span>No games loaded yet — refresh the app first.</div></div>`;
+    return;
+  }
+
+  // Show loading state
+  el.innerHTML = `<div class="potd-wrap">${disclaimerHTML}<div class="potd-lock-card"><div class="potd-loading"><div class="spin"></div>Claude is locking in today's best play...</div></div></div>`;
+
+  // Build a tight prompt with all game data
+  const gamesContext = S.games.map(g => {
+    const homeStats = getNBAStats(g.home);
+    const awayStats = getNBAStats(g.away);
+    const analysis  = S.analyses[g.id];
+    const mb        = g.multiOdds;
+    const spread    = g.odds?.homeSpread != null
+      ? `${g.home.abbr} ${g.odds.homeSpread > 0 ? '+' : ''}${g.odds.homeSpread}`
+      : 'line TBD';
+    const ou        = g.odds?.overUnder ? `O/U ${g.odds.overUnder}` : '';
+    const cons      = mb ? `consensus ${g.home.abbr} ${mb.consensusSpread > 0 ? '+' : ''}${mb.consensusSpread}` : '';
+    const aiPick    = analysis && !analysis.skipPick ? `AI: ${analysis.pick} (${analysis.confidence})` : '';
+    const netH      = homeStats ? `homeNET ${homeStats.E_NET_RATING > 0 ? '+' : ''}${homeStats.E_NET_RATING?.toFixed(1)}` : '';
+    const netA      = awayStats ? `awayNET ${awayStats.E_NET_RATING > 0 ? '+' : ''}${awayStats.E_NET_RATING?.toFixed(1)}` : '';
+    const b2b       = [g.home.isB2B ? `${g.home.abbr} B2B` : '', g.away.isB2B ? `${g.away.abbr} B2B` : ''].filter(Boolean).join(', ');
+    return `${g.away.abbr} @ ${g.home.abbr} | ${g.time} | ${spread} | ${ou} | ${cons} | PWR: away ${g.away.power} home ${g.home.power} | ${netA} ${netH} | ${b2b} | ${aiPick}`.replace(/\s\|(\s\|)+/g,' |').trim();
+  }).join('\n');
+
+  const prompt = `You are a sharp NBA betting analyst. Your job is to pick exactly ONE "lock" play from today's slate — the single highest-confidence, lowest-risk play available. Not necessarily the biggest payout; it should be a play you'd stake your reputation on.
+
+TODAY'S NBA GAMES:
+${gamesContext}
+
+Return ONLY valid JSON — no extra text, no markdown, no code fences. Schema:
+{
+  "awayAbbr": "string",
+  "homeAbbr": "string",
+  "pick": "e.g. BOS -4.5 or LAL ML or OVER 224.5",
+  "pickTeamAbbr": "the team abbreviation the pick is on (or 'OVER'/'UNDER' for totals)",
+  "line": "e.g. -4.5 or ML or O 224.5",
+  "betType": "Spread | Moneyline | Over | Under",
+  "reasoning": "1-2 sentence sharp summary of why this is a lock",
+  "factors": ["factor 1", "factor 2", "factor 3"],
+  "powerEdge": "e.g. +8.2 pts",
+  "confidence": "number 1-100"
+}`;
+
+  try {
+    // /api/potd caches server-side by calendar date — 1 Claude call per day total
+    const r = await fetch('/api/potd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await r.json();
+    if (data?.error) throw new Error(data.error);
+    const raw = JSON.stringify(data); // already parsed JSON from server
+
+    // Server already returns parsed JSON (either fresh from Claude or cached)
+    let lock;
+    try { lock = data; } catch { lock = {}; }
+
+    if (!lock.pick || !lock.awayAbbr) {
+      el.innerHTML = `<div class="potd-wrap">${disclaimerHTML}<div class="potd-err"><span style="font-size:36px;display:block;margin-bottom:10px">🤔</span>Couldn't lock one in right now — try refreshing.</div></div>`;
+      potdGenerated = false;
+      return;
+    }
+
+    // Find matching game for logo
+    const game = S.games.find(g => g.away.abbr === lock.awayAbbr && g.home.abbr === lock.homeAbbr)
+               || S.games.find(g => g.away.abbr === lock.awayAbbr || g.home.abbr === lock.homeAbbr);
+
+    const isTotal = lock.betType === 'Over' || lock.betType === 'Under';
+    const pickTeam = !isTotal && game
+      ? (game.home.abbr === lock.pickTeamAbbr ? game.home : game.away)
+      : null;
+    const oppTeam  = !isTotal && game
+      ? (game.home.abbr === lock.pickTeamAbbr ? game.away : game.home)
+      : null;
+
+    const logoHTML = pickTeam
+      ? `<img class="potd-team-logo" src="${pickTeam.logo}" alt="${pickTeam.abbr}" onerror="this.style.opacity=0">`
+      : `<div style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:32px">🏀</div>`;
+
+    const teamNameHTML = pickTeam
+      ? `<div class="potd-team-name">${pickTeam.name}</div><div class="potd-team-sub">vs ${oppTeam?.name || ''} · ${game?.time || ''}</div>`
+      : `<div class="potd-team-name">${lock.pick}</div><div class="potd-team-sub">${lock.awayAbbr} @ ${lock.homeAbbr}</div>`;
+
+    const factorsHTML = (lock.factors || []).map(f =>
+      `<div class="potd-factor"><span class="potd-factor-icon">📌</span><span>${escHtml(f)}</span></div>`
+    ).join('');
+
+    const homeStats = game ? getNBAStats(game.home) : null;
+    const awayStats = game ? getNBAStats(game.away) : null;
+    const hNet = homeStats?.E_NET_RATING?.toFixed(1);
+    const aNet = awayStats?.E_NET_RATING?.toFixed(1);
+    const hPwr = game?.home.power;
+    const aPwr = game?.away.power;
+    const ou   = game?.odds?.overUnder;
+
+    const statsHTML = [
+      lock.confidence ? `<div class="potd-stat"><span class="potd-stat-val">${lock.confidence}</span><span class="potd-stat-lbl">Confidence</span></div>` : '',
+      lock.powerEdge  ? `<div class="potd-stat"><span class="potd-stat-val">${escHtml(lock.powerEdge)}</span><span class="potd-stat-lbl">Model Edge</span></div>` : '',
+      hPwr            ? `<div class="potd-stat"><span class="potd-stat-val">${hPwr}</span><span class="potd-stat-lbl">${game.home.abbr} PWR</span></div>` : '',
+      aPwr            ? `<div class="potd-stat"><span class="potd-stat-val">${aPwr}</span><span class="potd-stat-lbl">${game.away.abbr} PWR</span></div>` : '',
+      hNet            ? `<div class="potd-stat"><span class="potd-stat-val">${hNet > 0 ? '+' : ''}${hNet}</span><span class="potd-stat-lbl">${game.home.abbr} NET</span></div>` : '',
+      aNet            ? `<div class="potd-stat"><span class="potd-stat-val">${aNet > 0 ? '+' : ''}${aNet}</span><span class="potd-stat-lbl">${game.away.abbr} NET</span></div>` : '',
+      ou              ? `<div class="potd-stat"><span class="potd-stat-val">${ou}</span><span class="potd-stat-lbl">O/U</span></div>` : '',
+    ].filter(Boolean).join('');
+
+    el.innerHTML = `<div class="potd-wrap">
+      ${disclaimerHTML}
+      <div class="potd-lock-card">
+        <div class="potd-top">
+          <span class="potd-crown">🏆</span>
+          <div class="potd-title-block">
+            <div class="potd-label">Play of the Day</div>
+            <div class="potd-title">${escHtml(lock.pick)}</div>
+          </div>
+          <span class="potd-lock-badge">🔒 LOCK</span>
+        </div>
+        <div class="potd-matchup">
+          ${logoHTML}
+          <div class="potd-team-info">${teamNameHTML}</div>
+          <div class="potd-vs-block">
+            <span class="potd-vs">${lock.betType || 'Pick'}</span>
+            <span class="potd-pick-line">${escHtml(lock.line || lock.pick)}</span>
+          </div>
+        </div>
+        <div class="potd-body">
+          <div class="potd-reasoning">"${escHtml(lock.reasoning || '')}"</div>
+          <div class="potd-factors">${factorsHTML}</div>
+        </div>
+        ${statsHTML ? `<div class="potd-stats-row">${statsHTML}</div>` : ''}
+      </div>
+    </div>`;
+
+  } catch(e) {
+    el.innerHTML = `<div class="potd-wrap">${disclaimerHTML}<div class="potd-err"><span style="font-size:36px;display:block;margin-bottom:10px">⚠️</span>${escHtml(e.message)}</div></div>`;
+    potdGenerated = false;
+  }
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function setTab(n){
+  document.querySelectorAll('.tsec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`tab-${n}`)?.classList.add('active');
+  document.getElementById(`tb-${n}`)?.classList.add('active');
+  if(n==='record') renderTrackRecord();
+  if(n==='potd')   renderPOTD();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function saveCachedGames(games){
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    localStorage.setItem('courtiq_games_cache',JSON.stringify({date:today,games}));
+  }catch{}
+}
+function loadCachedGames(){
+  try{
+    const raw=localStorage.getItem('courtiq_games_cache');
+    if(!raw)return null;
+    const{date,games}=JSON.parse(raw);
+    const today=new Date().toISOString().slice(0,10);
+    return date===today?games:null;
+  }catch{return null;}
+}
+
+async function init(){
+  document.getElementById('lov').classList.remove('hide');
+  document.getElementById('app').style.opacity='0';
+  S={games:[],analyses:{},analyzing:new Set(),notes:loadNotes(),standings:{},openingOdds:{},nbaStats:{},multiOdds:{},publicBetting:{},refreshTimer:S.refreshTimer||null};
+  updateAIStatus();
+
+  // ── INSTANT: show cached games from last visit with no spinner ─────────────
+  const cached=loadCachedGames();
+  if(cached&&cached.length){
+    S.games=cached;
+    const today=new Date();
+    document.getElementById('hdate').textContent=ftlong(today);
+    document.getElementById('gbadge').textContent=`${cached.length} Game${cached.length!==1?'s':''} Today`;
+    document.getElementById('gg').innerHTML=cached.map(renderCard).join('');
+    document.getElementById('lov').classList.add('hide');
+    document.getElementById('app').style.opacity='1';
+    maybeShowGuide();
+  }
+
+  try {
+    const today=new Date(), yest=new Date(today); yest.setDate(yest.getDate()-1);
+
+    // Fetch fresh scoreboard in background (spinner only shown on first-ever visit)
+    if(!cached) document.getElementById('ltxt').textContent='Fetching game data...';
+    const[todayD,yestD]=await Promise.all([
+      fetchJ(`${ESPN}/scoreboard?dates=${ds(today)}`),
+      fetchJ(`${ESPN}/scoreboard?dates=${ds(yest)}`).catch(()=>({events:[]}))
+    ]);
+    resolveResults(yestD.events||[]);
+
+    const yestSet=new Set();
+    (yestD.events||[]).forEach(ev=>(ev.competitions?.[0]?.competitors||[]).forEach(c=>yestSet.add(c.team?.id)));
+
+    // Parse base games
+    const games=[];
+    for(const ev of (todayD.events||[])){
+      const comp=ev.competitions?.[0]; if(!comp)continue;
+      const cs=comp.competitors||[];
+      const hC=cs.find(c=>c.homeAway==='home')||cs[1];
+      const aC=cs.find(c=>c.homeAway==='away')||cs[0];
+      if(!hC||!aC)continue;
+      const home=parseTeam(hC,yestSet), away=parseTeam(aC,yestSet);
+      home.power=calcPower(home); away.power=calcPower(away);
+      const sbOdds=parseOddsFromSB(comp.odds);
+      const st=comp.status?.type;
+      const refs=(comp.officials||[]).map(o=>o.official?.displayName||o.official?.fullName||'').filter(Boolean);
+      games.push({
+        id:ev.id, home, away, odds:sbOdds,
+        time:st?.detail||ft(ev.date),
+        venue:comp.venue?.fullName||comp.venue?.city||'',
+        broadcast:(comp.broadcasts||[]).map(b=>b.names?.[0]||'').filter(Boolean)[0]||'',
+        status:st?.name,
+        homeInjuries:[], awayInjuries:[], news:[],
+        refs
+      });
+    }
+
+    S.games=games;
+    games.forEach(g=>{ if(g.odds&&!S.openingOdds[g.id]) S.openingOdds[g.id]={...g.odds}; });
+    saveCachedGames(games);
+
+    document.getElementById('hdate').textContent=ftlong(today);
+    document.getElementById('hupd').textContent=`Updated ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
+    document.getElementById('gbadge').textContent=`${games.length} Game${games.length!==1?'s':''} Today`;
+
+    document.getElementById('gg').innerHTML=games.map(renderCard).join('');
+    document.getElementById('lov').classList.add('hide');
+    document.getElementById('app').style.opacity='1';
+    maybeShowGuide();
+
+    // ── Background enrichment — doesn't block the UI ───────────────────────────
+    enrichGames(games);
+
+  } catch(e){
+    console.error(e);
+    if(!cached){
+      document.getElementById('gg').innerHTML=`<div class="empty" style="grid-column:1/-1"><span class="ei">⚠️</span>Failed to load. Check connection and refresh.<br><small style="color:var(--dim);margin-top:6px;display:block">${e.message}</small></div>`;
+    }
+    document.getElementById('lov').classList.add('hide');
+    document.getElementById('app').style.opacity='1';
+  }
+}
+
+async function enrichGames(games){
+  // Load everything else in parallel — none of this blocks the initial render
+  const[standings,nbaStats,multiOdds,publicBetting,injMap,news]=await Promise.all([
+    fetchStandings(), fetchNBAAdvancedStats(), fetchMultiBookOdds(), fetchPublicBetting(),
+    fetchInjuries(), fetchNews()
+  ]);
+  S.standings=standings;
+  S.nbaStats=nbaStats;
+  S.multiOdds=multiOdds;
+  S.publicBetting=publicBetting;
+
+  games.forEach(g=>{
+    const key=`${g.away.abbr}@${g.home.abbr}`;
+    g.multiOdds=S.multiOdds[key]||null;
+    g.publicBetting=S.publicBetting[key]||null;
+    g.homeInjuries=injMap[g.home.id]||[];
+    g.awayInjuries=injMap[g.away.id]||[];
+    g.news=news.filter(n=>n.teamIds.includes(g.home.id)||n.teamIds.includes(g.away.id));
+  });
+
+  // Re-render all cards with standings + advanced stats + odds data
+  games.forEach(g=>{ const el=document.getElementById(`card-${g.id}`); if(el) el.outerHTML=renderCard(g); });
+  updatePicksTab(); renderTeamsTab(); renderTrackRecord();
+
+  // Per-game: schedules + lineups + core odds — update each card as it arrives
+  await Promise.all(games.map(async g=>{
+    const[coreOdds,hSched,aSched,lineup]=await Promise.all([
+      fetchCoreOdds(g.id),
+      fetchTeamSched(g.home.id),
+      fetchTeamSched(g.away.id),
+      fetchGameLineup(g.id)
+    ]);
+    if(coreOdds) g.odds=coreOdds;
+    g.home.restDays=hSched.restDays; g.home.roadStreak=hSched.roadStreak; g.home.recent=hSched.recent; g.home.ats=hSched.ats; g.home.avgPts=hSched.avgPts; g.home.avgOppPts=hSched.avgOppPts;
+    g.away.restDays=aSched.restDays; g.away.roadStreak=aSched.roadStreak; g.away.recent=aSched.recent; g.away.ats=aSched.ats; g.away.avgPts=aSched.avgPts; g.away.avgOppPts=aSched.avgOppPts;
+    g.h2h=computeH2H(hSched, g.away.id);
+    g.lineup=lineup;
+    // Update just this card the moment its data is ready
+    const el=document.getElementById(`card-${g.id}`);
+    if(el) el.outerHTML=renderCard(g);
+  }));
+
+  // Recompute power ratings now that schedule data is available
+  games.forEach(g=>{
+    g.home.power=calcPower(g.home); g.away.power=calcPower(g.away);
+    const el=document.getElementById(`card-${g.id}`); if(el) el.outerHTML=renderCard(g);
+  });
+
+  updatePicksTab(); renderTeamsTab(); renderTrackRecord();
+
+  // Start AI analysis now that all data is enriched
+  startAnalysis();
+
+  if(S.refreshTimer) clearInterval(S.refreshTimer);
+  S.refreshTimer=setInterval(silentRefresh,REFRESH_INTERVAL_MS);
+}
+
+function parseOddsFromSB(arr){
+  if(!arr?.length)return null;
+  const o=arr[0];
+  const spread=parseFloat(o.spread), ou=parseFloat(o.overUnder);
+  const homeFav=o.homeTeamOdds?.favorite===true, awayFav=o.awayTeamOdds?.favorite===true;
+  let hs;
+  if(!isNaN(spread)){if(homeFav)hs=-Math.abs(spread);else if(awayFav)hs=Math.abs(spread);else{const d=parseFloat(o.details);hs=isNaN(d)?0:-d;}}else hs=0;
+  return{homeSpread:hs,overUnder:isNaN(ou)?null:ou,homeML:o.homeTeamOdds?.moneyLine??null,awayML:o.awayTeamOdds?.moneyLine??null,spreadOdds:o.homeTeamOdds?.spreadOdds??-110,overOdds:-110,underOdds:-110,homeFav,awayFav,provider:'ESPN BET'};
+}
+
+async function silentRefresh(){
+  try{
+    const today=new Date();
+    const[todayD,injMap,news,freshMultiOdds,freshPublicBetting]=await Promise.all([
+      fetchJ(`${ESPN}/scoreboard?dates=${ds(today)}`),
+      fetchInjuries(), fetchNews(), fetchMultiBookOdds(), fetchPublicBetting()
+    ]);
+    S.multiOdds = freshMultiOdds;
+    S.publicBetting = freshPublicBetting;
+    // Re-attach to games
+    S.games.forEach(g => {
+      const key = `${g.away.abbr}@${g.home.abbr}`;
+      g.multiOdds = S.multiOdds[key] || null;
+      g.publicBetting = S.publicBetting[key] || null;
+    });
+    const evMap={};
+    (todayD.events||[]).forEach(ev=>{ evMap[ev.id]=ev; });
+
+    const reanalQueue=[];
+    for(const g of S.games){
+      const ev=evMap[g.id]; if(!ev)continue;
+      const comp=ev.competitions?.[0]; if(!comp)continue;
+
+      // Update injuries + news
+      g.homeInjuries=injMap[g.home.id]||[];
+      g.awayInjuries=injMap[g.away.id]||[];
+      g.news=news.filter(n=>n.teamIds.includes(g.home.id)||n.teamIds.includes(g.away.id));
+
+      // Refresh lineup data
+      const freshLineup = await fetchGameLineup(g.id);
+      if (freshLineup) g.lineup = freshLineup;
+
+      // Update odds + detect line movement
+      const sbOdds=parseOddsFromSB(comp.odds);
+      const [coreOdds]=await Promise.all([fetchCoreOdds(g.id)]);
+      const newOdds=coreOdds||sbOdds;
+      if(newOdds){
+        const prev=g.odds;
+        const moved=prev&&Math.abs((newOdds.homeSpread||0)-(prev.homeSpread||0))>=LINE_MOVE_REANALYZE_DELTA;
+        g.odds=newOdds;
+        if(moved) reanalQueue.push(g.id);
+      }
+
+      // Re-render just the odds section of this card
+      const cardEl=document.getElementById(`card-${g.id}`);
+      if(cardEl){
+        // Re-render full card in place
+        cardEl.outerHTML=renderCard(g);
+        // Restore AI section if already analyzed
+        const aiEl=document.getElementById(`ai-${g.id}`);
+        if(aiEl&&S.analyses[g.id]) aiEl.innerHTML=renderAIResult(S.analyses[g.id]);
+      }
+    }
+
+    // Re-analyze games with significant line movement
+    for(const gid of reanalQueue){
+      delete S.analyses[gid];
+      analyzeGame(gid);
+    }
+
+    // Update timestamp
+    document.getElementById('hupd').textContent=`Updated ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})} · auto-refreshing`;
+    const aiStatusEl=document.getElementById('ai-status');
+    if(aiStatusEl&&S.analyzing.size===0){
+      aiStatusEl.innerHTML=`<span class="refresh-dot"></span><span style="color:var(--dim);font-size:11px">Live</span>`;
+      setTimeout(()=>{ updateAIStatus(); },3000);
+    }
+  }catch(e){ console.warn('Silent refresh failed:',e.message); }
+}
+
+// ─── TOOLTIP TAP (mobile) ─────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const tip = e.target.closest('.tip');
+  document.querySelectorAll('.tip.tip-open').forEach(el => { if(el !== tip) el.classList.remove('tip-open'); });
+  if(tip) tip.classList.toggle('tip-open');
+});
+
+// ─── ONBOARDING MODAL ────────────────────────────────────────────────────────
+function showGuide(){
+  document.getElementById('ob-overlay').classList.remove('hide');
+}
+function closeGuide(){
+  document.getElementById('ob-overlay').classList.add('hide');
+  try{ localStorage.setItem('courtiq_guided','1'); }catch{}
+}
+function maybeShowGuide(){
+  try{ if(!localStorage.getItem('courtiq_guided')) showGuide(); }catch{}
+}
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+init();
+
+// Show Perky NEW badge if not seen before
+try{ if(!localStorage.getItem('courtiq_perky_seen')){ document.getElementById('perky-badge').classList.add('show'); } }catch{}
+
+// ─── PERKY AI CHATBOT ─────────────────────────────────────────────────────────
+const PERKY = {
+  open: false,
+  step: 0,       // conversation step
+  playType: '',
+  betAmount: '',
+  profitGoal: '',
+  thinking: false,
+  // steps: 0=greeting/play type, 1=bet amount, 2=profit goal, 3=fetching picks
+};
+
+function togglePerky() {
+  PERKY.open = !PERKY.open;
+  const panel = document.getElementById('perky-panel');
+  panel.classList.toggle('open', PERKY.open);
+  document.getElementById('perky-badge').classList.remove('show');
+  try{ localStorage.setItem('courtiq_perky_seen','1'); }catch{}
+  if (PERKY.open && PERKY.step === 0) {
+    // First open — send greeting after a small delay
+    setTimeout(() => perkyBot("what we cookin today goat? 🔥"), 300);
+    setTimeout(() => perkyBot("tell me what type of play you're looking for 👇"), 900);
+    PERKY.step = 0.5; // awaiting play type chip
+    perkyShowChips(['Spread', 'Parlay', 'Moneyline', 'Props', 'Surprise me 🎲']);
+  }
+}
+
+function perkyShowChips(labels) {
+  const wrap = document.getElementById('perky-chips');
+  wrap.innerHTML = labels.map(l =>
+    `<button class="perky-chip" onclick="perkyChip(this,'${l}')">${l}</button>`
+  ).join('');
+}
+
+function perkyHideChips() {
+  document.getElementById('perky-chips').innerHTML = '';
+}
+
+function perkyBot(msg, isHTML = false) {
+  const msgs = document.getElementById('perky-msgs');
+  const div = document.createElement('div');
+  div.className = 'perky-msg';
+  div.innerHTML = `<div class="pm-bubble pm-bot">${isHTML ? msg : escHtml(msg)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function perkyUserMsg(msg) {
+  const msgs = document.getElementById('perky-msgs');
+  const div = document.createElement('div');
+  div.className = 'perky-msg user';
+  div.innerHTML = `<div class="pm-bubble pm-user">${escHtml(msg)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function perkyTyping() {
+  const msgs = document.getElementById('perky-msgs');
+  const div = document.createElement('div');
+  div.className = 'perky-msg';
+  div.id = 'perky-typing';
+  div.innerHTML = `<div class="pm-bubble pm-bot pm-typing"><span class="pm-dot"></span><span class="pm-dot"></span><span class="pm-dot"></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function perkyStopTyping() {
+  document.getElementById('perky-typing')?.remove();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function perkyChip(btn, label) {
+  perkyHideChips();
+  perkyUserMsg(label);
+
+  if (PERKY.step === 0.5) {
+    // Play type chosen
+    PERKY.playType = label;
+    PERKY.step = 1;
+    setTimeout(() => {
+      perkyBot("nice 🤝 how much you dropping on this? (e.g. $50, $100, $200)");
+    }, 400);
+  }
+}
+
+function perkySend() {
+  if (PERKY.thinking) return;
+  const input = document.getElementById('perky-input');
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  perkyUserMsg(val);
+
+  if (PERKY.step === 1) {
+    // Bet amount
+    PERKY.betAmount = val;
+    PERKY.step = 2;
+    setTimeout(() => {
+      perkyBot("and what's your profit goal? (e.g. $150, double it, +5 units)");
+    }, 400);
+  } else if (PERKY.step === 2) {
+    // Profit goal — now find picks
+    PERKY.profitGoal = val;
+    PERKY.step = 3;
+    perkyFetchPicks();
+  } else if (PERKY.step === 4) {
+    // Follow-up question after picks
+    perkyFollowUp(val);
+  }
+}
+
+function perkyInputKey(e) {
+  if (e.key === 'Enter') perkySend();
+}
+
+async function perkyFetchPicks() {
+  PERKY.thinking = true;
+  document.getElementById('perky-send').disabled = true;
+
+  setTimeout(() => perkyBot("give me a sec, i'm scanning today's card... 🔍"), 300);
+  setTimeout(() => perkyTyping(), 600);
+
+  // Build context from loaded games
+  const games = S.games || [];
+  const gamesContext = games.map(g => {
+    const homeStats = getNBAStats(g.home);
+    const awayStats = getNBAStats(g.away);
+    const analysis = S.analyses[g.id];
+    const mb = g.multiOdds;
+    const spread = g.odds?.homeSpread != null
+      ? `${g.home.abbr} ${g.odds.homeSpread > 0 ? '+' : ''}${g.odds.homeSpread}`
+      : 'line TBD';
+    const ou = g.odds?.overUnder ? `O/U ${g.odds.overUnder}` : '';
+    const consensus = mb ? `consensus: ${g.home.abbr} ${mb.consensusSpread > 0 ? '+' : ''}${mb.consensusSpread}` : '';
+    const aiPick = analysis && !analysis.skipPick ? `AI pick: ${analysis.pick} (${analysis.confidence})` : '';
+    const netH = homeStats ? `NET ${homeStats.E_NET_RATING > 0 ? '+' : ''}${homeStats.E_NET_RATING?.toFixed(1)}` : '';
+    const netA = awayStats ? `NET ${awayStats.E_NET_RATING > 0 ? '+' : ''}${awayStats.E_NET_RATING?.toFixed(1)}` : '';
+    return `${g.away.abbr} @ ${g.home.abbr} | ${g.time} | Spread: ${spread} | ${ou} | ${consensus} | PWR: away ${g.away.power} vs home ${g.home.power} | ${netA} vs ${netH} | ${aiPick}`.trim();
+  }).join('\n');
+
+  const playTypeNote = PERKY.playType === 'Surprise me 🎲'
+    ? 'Mix of spread and parlay — surprise the user with your best creative combo'
+    : `User wants ${PERKY.playType} plays`;
+
+  const prompt = `You are Perky, CourtIQ's sharp NBA betting AI assistant. You talk like a knowledgeable sports betting friend — confident, concise, a little hype but always data-driven. No disclaimers needed.
+
+USER REQUEST:
+- Play type: ${playTypeNote}
+- Bet amount: ${PERKY.betAmount}
+- Profit goal: ${PERKY.profitGoal}
+
+TODAY'S NBA SLATE:
+${gamesContext || 'No games loaded yet — give general advice'}
+
+Based on the user's bet amount and profit goal, find the best specific plays from today's slate. Calculate exact payouts. If they want a parlay, build one with 2-3 legs max. If spread/ML, give 1-2 top picks. Be specific: name the team, the line, explain WHY in 1-2 sentences max per pick. Format your response with clear line breaks. Start with the play(s) then give a brief reason. Keep it under 200 words total. Use emojis sparingly for energy.`;
+
+  try {
+    const r = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await r.json();
+    const text = data?.content?.[0]?.text || "couldn't pull the data right now, try again in a sec";
+    perkyStopTyping();
+    // Split into paragraphs and show as formatted HTML
+    const html = text.split('\n').filter(l => l.trim()).map(l => `<p style="margin:0 0 6px">${escHtml(l)}</p>`).join('');
+    perkyBot(html, true);
+    setTimeout(() => {
+      perkyBot("want me to dig deeper on any of these? or build a different play? 🎯");
+      PERKY.step = 4;
+    }, 800);
+  } catch(e) {
+    perkyStopTyping();
+    perkyBot("hit a snag pulling the data 😤 try again in a moment");
+  }
+
+  PERKY.thinking = false;
+  document.getElementById('perky-send').disabled = false;
+}
+
+async function perkyFollowUp(userMsg) {
+  PERKY.thinking = true;
+  document.getElementById('perky-send').disabled = true;
+  perkyTyping();
+
+  const games = S.games || [];
+  const gamesContext = games.map(g => {
+    const analysis = S.analyses[g.id];
+    const spread = g.odds?.homeSpread != null ? `${g.home.abbr} ${g.odds.homeSpread > 0 ? '+' : ''}${g.odds.homeSpread}` : 'TBD';
+    const aiPick = analysis && !analysis.skipPick ? `AI: ${analysis.pick} (${analysis.confidence})` : '';
+    return `${g.away.abbr} @ ${g.home.abbr} | ${spread} | ${aiPick}`;
+  }).join('\n');
+
+  const prompt = `You are Perky, CourtIQ's sharp NBA betting AI. Talk like a knowledgeable betting friend — confident, concise, hype but data-driven. No disclaimers needed. Keep response under 150 words.
+
+TODAY'S SLATE:\n${gamesContext}
+
+PREVIOUS CONTEXT: User wanted ${PERKY.playType} plays, betting ${PERKY.betAmount}, targeting ${PERKY.profitGoal} profit.
+
+USER FOLLOW-UP: ${userMsg}
+
+Respond helpfully and specifically. If they ask about a specific game, give your take. If they want adjustments to the play, rebuild it. Always be specific with team names, lines, and payouts.`;
+
+  try {
+    const r = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MODEL, max_tokens: 350, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await r.json();
+    const text = data?.content?.[0]?.text || "tough one, try rephrasing?";
+    perkyStopTyping();
+    const html = text.split('\n').filter(l => l.trim()).map(l => `<p style="margin:0 0 6px">${escHtml(l)}</p>`).join('');
+    perkyBot(html, true);
+  } catch(e) {
+    perkyStopTyping();
+    perkyBot("something went wrong on my end, try again 🙏");
+  }
+
+  PERKY.thinking = false;
+  document.getElementById('perky-send').disabled = false;
+}
+</script>
+
+<!-- PERKY CHATBOT UI -->
+<div id="perky-panel" class="perky-panel">
+  <div class="perky-head">
+    <div class="perky-avatar">🤖</div>
+    <div class="perky-info">
+      <div class="perky-name">Perky</div>
+      <div class="perky-sub">Your AI betting assistant · powered by Claude</div>
+    </div>
+    <button class="perky-close" onclick="togglePerky()" title="Close">✕</button>
+  </div>
+  <div class="perky-msgs" id="perky-msgs"></div>
+  <div class="perky-chips" id="perky-chips"></div>
+  <div class="perky-input-row">
+    <input class="perky-input" id="perky-input" type="text" placeholder="type your reply..." onkeydown="perkyInputKey(event)" autocomplete="off">
+    <button class="perky-send" id="perky-send" onclick="perkySend()" title="Send">↑</button>
+  </div>
+</div>
+
+<button class="perky-btn" onclick="togglePerky()" title="Ask Perky for picks">
+  🤖
+  <span class="perky-badge" id="perky-badge">NEW</span>
+</button>
+</body>
+</html>

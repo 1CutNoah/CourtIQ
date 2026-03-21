@@ -1,0 +1,7 @@
+{
+  "name": "courtiq",
+  "version": "1.0.0",
+  "description": "NBA daily betting intelligence",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" }
+}

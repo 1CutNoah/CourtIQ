@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Dark background -->
+  <rect width="512" height="512" rx="96" fill="#0a0b0d"/>
+  <!-- Basketball outer ring -->
+  <circle cx="256" cy="230" r="150" fill="none" stroke="#00c2a8" stroke-width="20"/>
+  <!-- Vertical seam curves -->
+  <path d="M256 80 Q320 230 256 380" fill="none" stroke="#00c2a8" stroke-width="16" opacity="0.75"/>
+  <path d="M256 80 Q192 230 256 380" fill="none" stroke="#00c2a8" stroke-width="16" opacity="0.75"/>
+  <!-- Horizontal seam -->
+  <line x1="106" y1="230" x2="406" y2="230" stroke="#00c2a8" stroke-width="16" opacity="0.75"/>
+  <!-- IQ text centered in ball -->
+  <text x="256" y="270" font-family="Arial Black,sans-serif" font-size="130" font-weight="900" text-anchor="middle" fill="#00c2a8">IQ</text>
+  <!-- CourtIQ wordmark below ball -->
+  <text x="256" y="430" font-family="Arial,sans-serif" font-size="46" font-weight="700" text-anchor="middle" fill="#00c2a8" opacity="0.6" letter-spacing="4">COURTIQ</text>
+</svg>
